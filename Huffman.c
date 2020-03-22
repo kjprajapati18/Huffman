@@ -4,5 +4,6 @@
 
 int main(int argv, char* argc[]){
     printf("hello\n");
+    printf("hello wordl");
     return 0;
 }
