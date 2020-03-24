@@ -4,6 +4,10 @@
 
 void flagCheck(int flag, int argc, char* argv[]);
 
+int build = 0;
+int compress = 0;
+int decompress = 0;
+int recur = 0;
 int main(int argc, char* argv[]){
     flagCheck(1, argc, argv);
     return 0;
@@ -14,15 +18,19 @@ void flagCheck(int pos, int argc, char* argv[]){
     if(*argv[pos] == '-'){
         if(*(argv[pos]+1) == 'b'){
             printf("Using Build Huffman Codebook Flag\n");
+            build = 1;
         }
         else if(*(argv[pos]+1) == 'c'){
             printf("Using Compression Flag\n");
+            compress = 1;
         }
         else if(*(argv[pos]+1) == 'd'){
             printf("Using the Decompression Flag\n");
+            decompress = 1
         }
         else if(*(argv[pos]+1) == 'R'){
             printf("Using the Recursion Flag\n");
+            recur = 1;
         }
     }               
     flagCheck(pos+1, argc, argv);
