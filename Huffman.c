@@ -4,7 +4,7 @@
 #include <dirent.h>
 
 void flagCheck(int flag, int argc, char* argv[]);
-void printFiles(DIR* directory);
+void printFiles(DIR* directory, char* path);
 
 int main(int argc, char* argv[]){
     flagCheck(1, argc, argv);
@@ -14,7 +14,7 @@ int main(int argc, char* argv[]){
     }
     printf("Printing Directories:\n\n");
     printf("Files in %s:\n", argv[3]);
-    printFiles(directory);
+    printFiles(directory, argv[3]);
     
     return 0;
 }
@@ -38,8 +38,10 @@ void flagCheck(int pos, int argc, char* argv[]){
     if (pos == 1) flagCheck(pos+1, argc, argv);
 }
 
-//prints files in a given directory and all subdirectories
-void printFiles(DIR* directory){
+//prints all files in a given directory and all subdirectories
+void printFiles(DIR* directory, char* basePath){
+    //this is kinda hella sus lmfao but it works
+    char path[NAME_MAX + strlen(basePath)];
     struct dirent* dir;
     while((dir = readdir(directory)) != NULL){
         if(dir->d_type == 8){
@@ -51,9 +53,13 @@ void printFiles(DIR* directory){
     while((dir = readdir(directory)) != NULL){
         if(dir->d_type == 4){
             if((dir->d_name[0]) == '.') continue;
-            DIR* direct = opendir(dir->d_name);
+            strcpy(path, basePath);
+            strcat(path, dir->d_name);
+            strcat(path, "/");
+            DIR* direct = opendir(path);
             printf("Files in %s: \n", dir->d_name);
-            printFiles(direct);
+            printFiles(direct, path);
         }
+        
     }
 }
