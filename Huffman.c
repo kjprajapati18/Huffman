@@ -17,8 +17,19 @@ int main(int argc, char* argv[]){
         printf("Could not open directory");
     }
     struct dirent *dir;
+    //print files
+    printf("Printing Files:\n");
     while((dir = readdir(directory)) != NULL){
-        printf("%s\n", dir->d_name);
+        if(dir->d_type == 8){
+            printf("%s\n", dir->d_name);
+        }
+    }
+    rewinddir(directory);
+    printf("Printing Directories:\n");
+    while((dir = readdir(directory)) != NULL){
+        if(dir->d_type == 4){
+            printf("%s\n", dir->d_name);
+        }
     }
     return 0;
 }
