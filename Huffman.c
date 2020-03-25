@@ -4,11 +4,7 @@
 #include <dirent.h>
 
 void flagCheck(int flag, int argc, char* argv[]);
-
-int build = 0;
-int compress = 0;
-int decompress = 0;
-int recur = 0;
+void printFiles(DIR* directory);
 
 int main(int argc, char* argv[]){
     flagCheck(1, argc, argv);
@@ -16,19 +12,17 @@ int main(int argc, char* argv[]){
     if(directory == NULL){
         printf("Could not open directory");
     }
-    struct dirent *dir;
-    //print files
-    printf("Printing Files:\n");
-    while((dir = readdir(directory)) != NULL){
-        if(dir->d_type == 8){
-            printf("%s\n", dir->d_name);
-        }
-    }
-    rewinddir(directory);
+    printf("Files in %s:\n", argv[3]);
+    printFiles(directory);
     printf("Printing Directories:\n");
+    struct dirent* dir;
+    rewinddir(directory);
     while((dir = readdir(directory)) != NULL){
         if(dir->d_type == 4){
-            printf("%s\n", dir->d_name);
+            if((dir->d_name)[0] == '.') continue;
+            DIR* direct = opendir(dir->d_name);
+            printf("Files in %s: \n", dir->d_name);
+            printFiles(direct);
         }
     }
     return 0;
@@ -51,5 +45,14 @@ void flagCheck(int pos, int argc, char* argv[]){
         }
     }
     if (pos == 1) flagCheck(pos+1, argc, argv);
+}
 
+//prints files in a given directory
+void printFiles(DIR* directory){
+    struct dirent* dir;
+    while((dir = readdir(directory)) != NULL){
+        if(dir->d_type == 8){
+            printf("%s\n", dir->d_name);
+        }
+    }
 }
