@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "avl.h"
 
 //helper method to find max of 2 numbers. returns 2nd number if equal
@@ -56,6 +57,22 @@ int balance(Node* head)){
     return height(head->left) - height(head->right);
 }
 
-Node* insert(Node* head){
-    
+Node* insert(Node* node, char* word, int num){
+    if(node == NULL) return(newNode(num, word));
+
+    if(strcmp(word, ptr->string) < 0)
+        node->left = insert(node->left, word, num);
+    else if(strcmp(word, ptr->string) > 0)
+        node->right = insert(node->right, word, num);
+    else{
+        (node->num)++;
+        return(node);
+    }
+
+    node->height = 1 + max(height(node->left), height(node->right));
+    int balance = balance(node);
+
+    if(balanceFactor > 1){
+        if()
+    }
 }

@@ -2,7 +2,7 @@
 #define AVL_H
 
 //tree nodes hold a string and an int- word and freq
-struct typdef node{
+typedef struct  node{
     char* string;
     int val;
     struct node* left;
