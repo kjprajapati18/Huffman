@@ -71,20 +71,25 @@ Node* insert(Node* node, char* word, int num){
 
     node->height = 1 + max(height(node->left), height(node->right));
     int balance = balance(node);
-
+    //left right or left left
     if(balance > 1){
+        //left left
         if(strcmp(word, node->left->string) < 0)
             return RR(node);
+        //left right
         else if(strcmp(word, node->left->string) > 0)
         {
             node->left = LR(node->left);
             return RR(node);
         }
     }
+    //right right or right left
     else if(balance < -1){
+        //right right
         if (strcmp(word, node->right->string) > 0){
             return LR(node);
         }
+        //right left
         else if(strcmp(word, node->right->string) < 0){
             node->left = RR(node-left);
             return LR(node);
