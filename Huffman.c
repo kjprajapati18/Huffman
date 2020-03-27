@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 
 #include "avl.h"
 /* TO DO LIST:::::::::::
@@ -19,8 +21,8 @@
 int flagCheck(char* argv[]);
 void printFiles(DIR* directory, char* path);
 void errorPrint(const char* message, int exitCode);
-int fillAVL(Node* head, int fd);
-
+int fillAVL(Node** head, int fd);
+void print2DTree(Node* root, int space);
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
 
@@ -56,7 +58,11 @@ int main(int argc, char* argv[]){
     //Finish up later
     int input = open(argv[2], O_RDONLY);
     if(input < 0) errorPrint("Could not open input file", 1);
-
+    int inputCheck = fillAVL(&head, input);
+    if(inputCheck == -1) errorPrint("FATAL ERROR: Could not fully finish tree", 1);
+    
+    print2DTree(head, 0);
+    
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
         if(codebook < 0) errorPrint("Could not open codebook", 1);
@@ -129,8 +135,9 @@ void errorPrint(const char* message, int exitCode){
 
 
 //Reader function to get input from files
-int fillAVL(Node* list, int fd){
+int fillAVL(Node** head, int fd){
 
+    Node* list = *head;
     int bytesRead = 1;
     int size = 0;
     char buffer[201];
@@ -195,6 +202,7 @@ int fillAVL(Node* list, int fd){
         insert(list, carryOver);
     }
     free(carryOver);
+    *head =list;
     return 0;
   /*
   ptr = list->first;
@@ -213,4 +221,29 @@ int fillAVL(Node* list, int fd){
 
   if(broke == 1) return 0;
   return 1;*/
+}
+
+
+void print2DTree(Node *root, int space) 
+{ 
+    // Base case 
+    if (root == NULL) 
+        return; 
+  
+    // Increase distance between levels 
+    space += 10; 
+  
+    // Process right child first 
+    print2DTree(root->right, space); 
+  
+    // Print current node after space 
+    // count 
+    printf("\n"); 
+    for (int i = 10; i < space; i++) 
+        printf(" ");
+    if(strcmp(" ", root->string) == 0) printf("[space]\n");
+    else printf("%s\n", root->string); 
+  
+    // Process left child 
+    print2DTree(root->left, space); 
 }
