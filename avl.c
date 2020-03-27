@@ -21,7 +21,7 @@ Node* makeNode(int num, char* word){
     newNode->val = num;
     newNode->left = NULL;
     newNode->right = NULL;
-    height = 1;
+    newNode->height = 1;
     return newNode;
 }
 //right rotation helper method to help with rebalancing
@@ -46,7 +46,7 @@ Node* LR(Node* head){
     head->right = changes;
     newHead->left = head;
 
-    head->height = max(height(head-left), height(head->right));
+    head->height = max(height(head->left), height(head->right));
     newHead->height = max(height(newHead->left), height(newHead->right));
 
     return newHead;
@@ -72,7 +72,31 @@ Node* insert(Node* node, char* word, int num){
     node->height = 1 + max(height(node->left), height(node->right));
     int balance = balance(node);
 
-    if(balanceFactor > 1){
-        if()
+    if(balance > 1){
+        if(strcmp(word, node->left->string) < 0)
+            return RR(node);
+        else if(strcmp(word, node->left->string) > 0)
+        {
+            node->left = LR(node->left);
+            return RR(node);
+        }
     }
+    else if(balance < -1){
+        if (strcmp(word, node->right->string) > 0){
+            return LR(node);
+        }
+        else if(strcmp(word, node->right->string) < 0){
+            node->left = RR(node-left);
+            return LR(node);
+        }
+    }
+    return node;
+}
+
+void freeAvl(Node* head){
+    Node* l = head->left;
+    Node* r = head->right;
+    free(head);
+    freeAvl(l);
+    freeAvl(r);
 }
