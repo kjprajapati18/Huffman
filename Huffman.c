@@ -19,6 +19,7 @@
 int flagCheck(char* argv[]);
 void printFiles(DIR* directory, char* path);
 void errorPrint(const char* message, int exitCode);
+int fillAVL(Node* head, int fd);
 
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
@@ -128,7 +129,7 @@ void errorPrint(const char* message, int exitCode){
 
 
 //Reader function to get input from files
-int getInput(Node* list, int fd){
+int fillAVL(Node* list, int fd){
 
     int bytesRead = 1;
     int size = 0;
@@ -137,8 +138,9 @@ int getInput(Node* list, int fd){
     int broke = 0;
 
     //If words aren't complete by the time read returns, we need to carry the word over.
-    char* carryOver;
-
+    int carryOverSize = 0;
+    char* carryOver = (char*) malloc(sizeof(char)); //Initialize with size 1 byte because the loop starts with freeing the old value.
+    *carryOver = '\0';
   
     do{
         bytesRead = read(fd, buffer, 200);
@@ -151,35 +153,50 @@ int getInput(Node* list, int fd){
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
 	        if (buffer[i] == ' '){
                 buffer[i] = '\0';
+
+                if(carryOverSize != 0){
+                    char* temp = (char*) malloc(sizeof(char)*(carryOverSize+(i-startIndex)+1));
+                    memcpy(temp, carryOver, carryOverSize);
+                    strcat(temp, buffer+startIndex);
+                    free(carryOver);
+                    carryOver = temp;
+                    list = insert(list, carryOver);
+                    carryOverSize = 0;
+                } else {
+                    list = insert(list, buffer+startIndex);
+                }
+
                 list = insert(list, " ");                   //FIX HERE::: If we at EOF, we shouldn't add a space. So theres some edge cases missing here
-	            list = insert(list, buffer+startIndex);     //insert will handle empty strings
+
 	            startIndex = i+1;
             }
         }
-        if(startIndex != bytesRead){
-            carryOver = (char *) malloc(sizeof(char) * (strlen(buffer+startIndex)+1));
-            carryOver
-        }
-    if(broke) break;
 
-    if(bytesRead == startIndex) continue;
-    buffer[200] = '\0';
-    size = strlen(ptr->value);
-    char* temp = (char*) malloc(bytesRead-startIndex+ size+1);
-    if(temp == NULL){
-      free(ptr->value);
-      free(ptr);
-      prev->next = NULL;
-      broke = 1;
-      break;
+        //Adjusting carryover
+        if(startIndex != bytesRead){
+            if(carryOverSize == 0){
+                free(carryOver);
+                carryOverSize = bytesRead-startIndex;
+                carryOver = (char *) malloc(sizeof(char) * (carryOverSize+1));
+                strcpy(carryOver, buffer+startIndex);
+            } else {
+                carryOverSize += bytesRead-startIndex;
+                char* temp = (char*) malloc(sizeof(char)*(carryOverSize+1));
+                memcpy(temp, carryOver, carryOverSize);
+                strcat(temp, buffer+startIndex);
+                free(carryOver);
+                carryOver = temp;
+            }
+        }
+
+    }while(bytesRead>0);
+    
+    if(carryOverSize !=0){
+        insert(list, carryOver);
     }
-    memcpy(temp, ptr->value, size+1);
-    free(ptr->value);
-    ptr->value = temp;
-    strcat(ptr->value, buffer+startIndex);
-    ptr->next = NULL;
-  }while(bytesRead>0);
-  
+    free(carryOver);
+    return 0;
+  /*
   ptr = list->first;
   while(ptr != NULL){
     for(i =0; i < strlen(ptr->value); i++){
@@ -195,5 +212,5 @@ int getInput(Node* list, int fd){
   }
 
   if(broke == 1) return 0;
-  return 1;
+  return 1;*/
 }
