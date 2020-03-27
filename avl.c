@@ -53,7 +53,7 @@ Node* LR(Node* head){
     return newHead;
 }
 
-int balance(Node* head){
+int balanceFactor(Node* head){
     if(head == NULL) return 0;
     return height(head->left) - height(head->right);
 }
@@ -72,7 +72,7 @@ Node* insert(Node* node, char* word){
     }
 
     node->height = 1 + max(height(node->left), height(node->right));
-    int balance = balance(node);
+    int balance = balanceFactor(node);
     //left right or left left
     if(balance > 1){
         //left left
@@ -93,7 +93,7 @@ Node* insert(Node* node, char* word){
         }
         //right left
         else if(strcmp(word, node->right->string) < 0){
-            node->left = RR(node-left);
+            node->left = RR(node->left);
             return LR(node);
         }
     }
@@ -104,6 +104,6 @@ void freeAvl(Node* head){
     Node* l = head->left;
     Node* r = head->right;
     free(head);
-    freeAvl(l);
-    freeAvl(r);
+    if(l != NULL) freeAvl(l);
+    if(r != NULL) freeAvl(r);
 }
