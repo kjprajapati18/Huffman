@@ -15,10 +15,11 @@ int height(Node* head){
     else return head->height;
 }
 //mallocs new node and sets word and frequency values
-Node* makeNode(int num, char* word){
+Node* makeNode(char* word){
     Node* newNode = (Node*) malloc(sizeof(Node));
-    newNode->string = word;
-    newNode->val = num;
+    newNode->string = (char*) malloc(sizeof(char) * (strlen(word)+1));
+    strcpy(newNode->string, word);
+    newNode->val = 1;
     newNode->left = NULL;
     newNode->right = NULL;
     newNode->height = 1;
@@ -52,21 +53,22 @@ Node* LR(Node* head){
     return newHead;
 }
 
-int balance(Node* head)){
+int balance(Node* head){
     if(head == NULL) return 0;
     return height(head->left) - height(head->right);
 }
 
-Node* insert(Node* node, char* word, int num){
-    if(node == NULL) return(newNode(num, word));
+Node* insert(Node* node, char* word){
+    if(word[0] == '\0') return node;
+    if(node == NULL) return makeNode(word);
 
-    if(strcmp(word, ptr->string) < 0)
-        node->left = insert(node->left, word, num);
-    else if(strcmp(word, ptr->string) > 0)
-        node->right = insert(node->right, word, num);
+    if(strcmp(word, node->string) < 0)
+        node->left = insert(node->left, word);
+    else if(strcmp(word, node->string) > 0)
+        node->right = insert(node->right, word);
     else{
-        (node->num)++;
-        return(node);
+        (node->val)++;
+        return node;
     }
 
     node->height = 1 + max(height(node->left), height(node->right));

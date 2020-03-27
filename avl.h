@@ -12,10 +12,10 @@ typedef struct  node{
 
 int max(int, int);
 int height(Node*);
-Node* makeNode(int, char*);
+Node* makeNode(char*);
 Node* RR(Node*);
 Node* LR(Node*);
-Node* insert(Node*);
+Node* insert(Node*, char*);
 
 
 #endif

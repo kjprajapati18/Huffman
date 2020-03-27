@@ -6,13 +6,27 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "avl.h"
+/* TO DO LIST:::::::::::
+
+    -Add checks for every malloc                                        (cuz he's reading our code)
+    -Make insert on AVL tree return an int and use double pointer       (I think that's convention)
+    -Rename LR and RR to leftRotation and rightRotation                 (for clarity)
+    -FIx AVL inserts
+    -Fix getInput spacing issue
+
+*/
 int flagCheck(char* argv[]);
 void printFiles(DIR* directory, char* path);
 void errorPrint(const char* message, int exitCode);
+
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
 
 int main(int argc, char* argv[]){
+
+    Node* head = NULL;
+
     //Check for valid inputs
     if(argc < 3) errorPrint("Fatal Error: Not enough arguments", 1);
 
@@ -110,4 +124,76 @@ void printFiles(DIR* directory, char* basePath){
 void errorPrint(const char* message, int exitCode){
     printf("%s\n", message);
     if(exitCode != 0) exit(exitCode);
+}
+
+
+//Reader function to get input from files
+int getInput(Node* list, int fd){
+
+    int bytesRead = 1;
+    int size = 0;
+    char buffer[201];
+    int i = 0;
+    int broke = 0;
+
+    //If words aren't complete by the time read returns, we need to carry the word over.
+    char* carryOver;
+
+  
+    do{
+        bytesRead = read(fd, buffer, 200);
+        if(bytesRead == -1) return -1;
+        else if (bytesRead == 0) break;
+        buffer[bytesRead] = '\0';
+
+        int startIndex = 0;
+        for(i = 0; i<bytesRead; i++){
+            if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
+	        if (buffer[i] == ' '){
+                buffer[i] = '\0';
+                list = insert(list, " ");                   //FIX HERE::: If we at EOF, we shouldn't add a space. So theres some edge cases missing here
+	            list = insert(list, buffer+startIndex);     //insert will handle empty strings
+	            startIndex = i+1;
+            }
+        }
+        if(startIndex != bytesRead){
+            carryOver = (char *) malloc(sizeof(char) * (strlen(buffer+startIndex)+1));
+            carryOver
+        }
+    if(broke) break;
+
+    if(bytesRead == startIndex) continue;
+    buffer[200] = '\0';
+    size = strlen(ptr->value);
+    char* temp = (char*) malloc(bytesRead-startIndex+ size+1);
+    if(temp == NULL){
+      free(ptr->value);
+      free(ptr);
+      prev->next = NULL;
+      broke = 1;
+      break;
+    }
+    memcpy(temp, ptr->value, size+1);
+    free(ptr->value);
+    ptr->value = temp;
+    strcat(ptr->value, buffer+startIndex);
+    ptr->next = NULL;
+  }while(bytesRead>0);
+  
+  ptr = list->first;
+  while(ptr != NULL){
+    for(i =0; i < strlen(ptr->value); i++){
+      if(isspace((ptr->value)[i])){
+	char buff[strlen(ptr->value) - i];
+	(ptr->value)[i] = '\0';
+	strcpy(buff, ptr->value + i + 1);
+	strcat(ptr->value, buff);
+	i--;
+      }
+    }
+    ptr = ptr->next;
+  }
+
+  if(broke == 1) return 0;
+  return 1;
 }
