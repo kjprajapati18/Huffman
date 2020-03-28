@@ -92,7 +92,7 @@ int main(int argc, char* argv[]){
     }
     //
     //////////////////////////
-    
+
     remove("./HuffmanCodebook");
     int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT);
     writeCodebook(minHeap[0], book, escapeChar);
@@ -104,6 +104,7 @@ int main(int argc, char* argv[]){
 
     free(escapeChar);
     close(input);
+    close(book);
     return 0;
 }
 
@@ -276,7 +277,6 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
 int writeCodebook(treeNode* head, int fd, char* escapeChar){
 
     printf("\ncodebook opened\n");
-    close(fd);
     return 0;
 }
 
