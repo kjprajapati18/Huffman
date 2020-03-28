@@ -10,7 +10,7 @@ typedef struct treeNode{
 }treeNode;
 
 //size of heap
-int HeapSize = 0;
+int HeapSize;
 //heapify method
 void heapify(treeNode**, int);
 

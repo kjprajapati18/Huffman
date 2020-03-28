@@ -20,8 +20,11 @@
     -Add checks for every malloc                                        (cuz he's reading our code)
     -Make insert on AVL tree return an int and use double pointer       (I think that's convention)
     -Rename LR and RR to leftRotation and rightRotation                 (for clarity)
-    -FIx AVL inserts
-    -Fix getInput spacing issue
+    
+    -Rename heapify to siftDown
+    -Write siftUp
+    -Create insert with siftUp
+    -Pop with siftDown
 
 */
 int flagCheck(char* argv[]);
@@ -31,6 +34,8 @@ int fillAVL(Node** head, int fd, char** escapeChar);
 int writeCodebook(treeNode* head, char* escapeChar);
 int incEscapeChar(char** escapeChar, int* escapeCharSize);
 void print2DTree(Node* root, int space);
+int fillMinHeapArray(treeNode* minHeap[], Node* root, int count);
+
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
 
@@ -63,7 +68,7 @@ int main(int argc, char* argv[]){
         return 0;
     }
 
-    //Finish up later
+
     int input = open(argv[2], O_RDONLY);
     if(input < 0) errorPrint("Could not open input file", 1);
 
@@ -79,15 +84,16 @@ int main(int argc, char* argv[]){
     
     //Put build huffman here
     //treeNode* head = NULL;
-    treeNode* minHeap[tokens];
+    HeapSize = tokens;
+    treeNode* minHeap[HeapSize];
     fillMinHeapArray(minHeap, head, 0);
     for(int i = tokens -1; i >= 0; i --){
-        heapify(minHeap), i);
+        heapify(minHeap, i);
     }
     //
     //////////////////////////
     
-    writeCodebook(head, escapeChar);
+    writeCodebook(minHeap[0], escapeChar);
 
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
@@ -273,7 +279,7 @@ int writeCodebook(treeNode* head, char* escapeChar){
     return 0;
 }
 
-int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){
+int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){   //Fills array with all converted TreeNode tokens from AVL
     if(root == NULL) return count;
     treeNode* newNode = (treeNode*) malloc(sizeof(treeNode));
     newNode->freq = root->val;
@@ -284,4 +290,5 @@ int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){
     count++;
     count = fillMinHeapArray(minHeap, root->left, count);
     count = fillMinHeapArray(minHeap, root->right, count);
+    return count;
 }
