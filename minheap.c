@@ -71,9 +71,7 @@ treeNode* pop(treeNode* minHeap[]){
     swap(&minHeap[0], &minHeap[HeapSize -1]);
     HeapSize-=1;
     int i;
-    for(i = HeapSize/2 -1; i >=0; i--){
-        heapify(minHeap, i);
-    }
+    heapify(minHeap, 0);
     return minHeap[HeapSize];
 }
 
