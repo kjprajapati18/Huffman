@@ -238,8 +238,9 @@ void print2DTree(Node *root, int space)
   
     // Print current node after space 
     // count 
-    printf("\n"); 
-    for (int i = 10; i < space; i++) 
+    printf("\n");
+    int i; 
+    for (i = 10; i < space; i++) 
         printf(" ");
     if(strcmp(" ", root->string) == 0) printf("[space]\n");
     else printf("%s\n", root->string); 

@@ -17,7 +17,7 @@ int main(int argc, char* argv[]){
     head = insert(head, test4);
     head = insert(head, test5);
     head = insert(head, test6);
-    print2D(head);
+    print2DTree(head, 0);
 }
 //helper method to find max of 2 numbers. returns 2nd number if equal
 int max(int a, int b){
@@ -123,4 +123,28 @@ void freeAvl(Node* head){
     free(head);
     if(l != NULL) freeAvl(l);
     if(r != NULL) freeAvl(r);
+}
+void print2DTree(Node *root, int space) 
+{ 
+    // Base case 
+    if (root == NULL) 
+        return; 
+  
+    // Increase distance between levels 
+    space += 10; 
+  
+    // Process right child first 
+    print2DTree(root->right, space); 
+  
+    // Print current node after space 
+    // count 
+    printf("\n");
+    int i; 
+    for (i = 10; i < space; i++) 
+        printf(" ");
+    if(strcmp(" ", root->string) == 0) printf("[space]\n");
+    else printf("%s\n", root->string); 
+  
+    // Process left child 
+    print2DTree(root->left, space); 
 }

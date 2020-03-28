@@ -19,8 +19,7 @@ int balanceFactor(Node*);
 Node* insert(Node*, char*);
 void freeAvl(Node*);
 void printPreOrder(Node*);
-void print2DUtil(Node* root, int space);
-void print2D(Node* root);
+void print2DTree(Node* root, int space);
 
 
 #endif
