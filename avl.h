@@ -20,6 +20,6 @@ Node* insert(Node*, char*);
 void freeAvl(Node*);
 void printPreOrder(Node*);
 void print2DTree(Node* root, int space);
-
+int tokens = 0;
 
 #endif
