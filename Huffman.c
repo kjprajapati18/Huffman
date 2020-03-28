@@ -31,10 +31,11 @@ int flagCheck(char* argv[]);
 void printFiles(DIR* directory, char* path);
 void errorPrint(const char* message, int exitCode);
 int fillAVL(Node** head, int fd, char** escapeChar);
-int writeCodebook(treeNode* head, int fd, char* escapeChar);
+int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString);
 int incEscapeChar(char** escapeChar, int* escapeCharSize);
 void print2DTree(Node* root, int space);
 int fillMinHeapArray(treeNode* minHeap[], Node* root, int count);
+int writeString(int fd, char* string);
 
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
@@ -102,7 +103,9 @@ int main(int argc, char* argv[]){
 
     remove("./HuffmanCodebook");
     int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT);
-    writeCodebook(minHeap[0], book, escapeChar);
+    writeString(book, escapeChar);
+    writeString(book, "\n");
+    //writeCodebook(minHeap[0], book, escapeChar, "");
 
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
@@ -281,11 +284,52 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
 
 }
 
-int writeCodebook(treeNode* head, int fd, char* escapeChar){
+int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
+    if(head == NULL) return -1;
+    int bitLength = strlen(bitString);
 
-    printf("\ncodebook opened\n");
+    if(head->left == NULL && head->right == NULL){ //Leaf Node, add to book
+        char* temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));    //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
+
+        memcpy(temp, bitString, bitLength);
+        temp[bitLength+1] = '\t';
+        temp[bitLength+2] = '\0';
+
+        //Just need to finish writeString function && escapeCharHandler function************************************************************************************************
+        //**********************************************************************************************************************************************************************
+        //**********************************************************************************************************************************************************************
+        //**********************************************************************************************************************************************************************
+        char* inputtedToken = isspace(head->token)? escapeCharHandler(escapeChar, head->token) : head->token;
+        //**********************************************************************************************************************************************************************
+        //**********************************************************************************************************************************************************************
+        //**********************************************************************************************************************************************************************
+
+
+        strcpy(temp, inputtedToken);
+        strcpy(temp, "\n");
+
+        writeString(fd, temp);
+        free(temp);
+        free(bitString);
+        return 0;
+    }
+
+    //If this point is reached, then there are children. Note that Huffman trees are strictly binary
+    char* newString = malloc(sizeof(char) * (bitLength+2));
+    memcpy(newString, bitString, bitLength+1);
+    newString[bitLength+1] = '\0';
+    
+    newString[bitLength] = '0';
+    writeCodebook(head->left, fd, escapeChar, newString);
+
+    newString[bitLength] = '1';
+    writeCodebook(head->right, fd, escapeChar, newString);
+
+    free(newString);
     return 0;
 }
+
+
 
 int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){   //Fills array with all converted TreeNode tokens from AVL
     if(root == NULL) return count;
@@ -300,3 +344,5 @@ int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){   //Fills arra
     count = fillMinHeapArray(minHeap, root->right, count);
     return count;
 }
+
+int writeString()
