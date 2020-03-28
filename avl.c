@@ -3,7 +3,9 @@
 #include <string.h>
 #include "avl.h"
 #define COUNT 10
-int main(int argc, char* argv[]){
+
+int tokens = 0;
+/*int main(int argc, char* argv[]){
     char* test1 = "test1";
     char* test2 = "test2";
     char* test3 = "add";
@@ -24,7 +26,7 @@ int main(int argc, char* argv[]){
     head = insert(head, test5);
     print2DTree(head, 0);
     printf("\n\n%d\n\n", tokens);
-}
+}*/
 //helper method to find max of 2 numbers. returns 2nd number if equal
 int max(int a, int b){
     return (a>b)? a: b;
@@ -151,6 +153,7 @@ void print2DTree(Node *root, int space)
     for (i = 10; i < space; i++) 
         printf(" ");
     if(strcmp(" ", root->string) == 0) printf("[space]\n");
+    else if(strcmp("\n", root->string) == 0) printf("[newline]\n");
     else printf("%s\n", root->string); 
   
     // Process left child 
