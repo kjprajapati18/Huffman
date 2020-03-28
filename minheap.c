@@ -84,3 +84,29 @@ treeNode* merge(treeNode* less, treeNode* great){
     return newNode;
 }
 
+void print2DTreeNode(treeNode *root, int space) 
+{ 
+    // Base case 
+    if (root == NULL) 
+        return; 
+  
+    // Increase distance between levels 
+    space += 10; 
+  
+    // Process right child first 
+    print2DTreeNode(root->right, space); 
+  
+    // Print current node after space 
+    // count 
+    printf("\n");
+    int i; 
+    for (i = 10; i < space; i++) 
+        printf(" ");
+    if(strcmp(" ", root->token) == 0) printf("[space]%d\n",root->freq);
+    else if(strcmp("\n", root->token) == 0) printf("[\\n]%d\n",root->freq);
+    else if(strcmp("\r", root->token) == 0) printf("[\\r]%d\n",root->freq);
+    else printf("%s%d\n", root->token, root->freq); 
+  
+    // Process left child 
+    print2DTreeNode(root->left, space); 
+}

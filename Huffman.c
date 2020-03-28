@@ -83,14 +83,21 @@ int main(int argc, char* argv[]){
     else printf("\nHead is null\n");
     
     //Put build huffman here
-    //treeNode* head = NULL;
     HeapSize = tokens;
     treeNode* minHeap[HeapSize];
     fillMinHeapArray(minHeap, head, 0);
-    for(int i = tokens -1; i >= 0; i --){
+    int i;
+    for(i = tokens -1; i >= 0; i --){
         heapify(minHeap, i);
     }
-    //
+    while(HeapSize >1){
+        treeNode* less = pop(minHeap);
+        treeNode* great = pop(minHeap);
+        treeNode* newNode = merge(less, great);
+        insertHeap(minHeap, newNode);
+    }
+    printf("%d", HeapSize);
+    print2DTreeNode(minHeap[0], 0);
     //////////////////////////
     
     writeCodebook(minHeap[0], escapeChar);
