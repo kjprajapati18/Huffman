@@ -178,7 +178,8 @@ int fillAVL(Node** head, int fd, char** escapeChar){
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
 	        if (isspace(buffer[i])){
                 delimiter[0] = buffer[i];
-                printf("%s\n",delimiter);
+                if(delimiter[0] == '\n') printf("newline\n");
+                else printf("%s\n",delimiter);
                 list = insert(list, delimiter);
                 buffer[i] = '\0';
 

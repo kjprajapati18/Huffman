@@ -152,9 +152,10 @@ void print2DTree(Node *root, int space)
     int i; 
     for (i = 10; i < space; i++) 
         printf(" ");
-    if(strcmp(" ", root->string) == 0) printf("[space]\n");
-    else if(strcmp("\n", root->string) == 0) printf("[newline]\n");
-    else printf("%s\n", root->string); 
+    if(strcmp(" ", root->string) == 0) printf("[space]%d\n",root->val);
+    else if(strcmp("\n", root->string) == 0) printf("[\\n]%d\n",root->val);
+    else if(strcmp("\r", root->string) == 0) printf("[\\r]%d\n",root->val);
+    else printf("%s%d\n", root->string, root->val); 
   
     // Process left child 
     print2DTree(root->left, space); 
