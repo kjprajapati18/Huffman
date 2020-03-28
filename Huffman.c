@@ -224,7 +224,7 @@ int fillAVL(Node** head, int fd){
 }
 
 
-void print2DTree(Node *root, int space) 
+/*void print2DTree(Node *root, int space) 
 { 
     // Base case 
     if (root == NULL) 
@@ -247,4 +247,4 @@ void print2DTree(Node *root, int space)
   
     // Process left child 
     print2DTree(root->left, space); 
-}
+}*/

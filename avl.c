@@ -148,8 +148,8 @@ void print2DTree(Node *root, int space)
     int i; 
     for (i = 10; i < space; i++) 
         printf(" ");
-    if(strcmp(" ", root->string) == 0) printf("[space]\n");
-    else printf("%s%d\n", root->string,root->height); 
+    if(strcmp(" ", root->string) == 0) printf("[space]%d\n",root->val);
+    else printf("%s%d\n", root->string,root->val); 
   
     // Process left child 
     print2DTree(root->left, space); 
