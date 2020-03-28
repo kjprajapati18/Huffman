@@ -23,13 +23,12 @@ int main(int argc, char* argv[]){
 int max(int a, int b){
     return (a>b)? a: b;
 }
+
 //returns height of tree from specific node
 int height(Node* head){
-    if (head == NULL){
-        return 0;
-    }
-    else return head->height;
+    return (head==NULL)? 0 : head->height;
 }
+
 //mallocs new node and sets word and frequency values
 Node* makeNode(char* word){
     Node* newNode = (Node*) malloc(sizeof(Node));
@@ -41,6 +40,7 @@ Node* makeNode(char* word){
     newNode->height = 0;
     return newNode;
 }
+
 //right rotation helper method to help with rebalancing
 Node* RR(Node* head){
     Node* newHead = head->left;
@@ -49,8 +49,8 @@ Node* RR(Node* head){
     head->left = changes;
     newHead->right = head;
 
-    head->height = max(height(head->left), height(head->right));                        //HEIGHT +1??????????????????????????????????????????????????????????????
-    newHead->height = max(height(newHead->left), height(newHead->right));
+    head->height = max(height(head->left), height(head->right))+1;                        
+    newHead->height = max(height(newHead->left), height(newHead->right))+1;
 
     return newHead;
 }
@@ -63,15 +63,14 @@ Node* LR(Node* head){
     head->right = changes;
     newHead->left = head;
 
-    head->height = max(height(head->left), height(head->right));
-    newHead->height = max(height(newHead->left), height(newHead->right));
+    head->height = max(height(head->left), height(head->right))+1;
+    newHead->height = max(height(newHead->left), height(newHead->right))+1;
 
     return newHead;
 }
 
 int balanceFactor(Node* head){
-    if(head == NULL) return 0;
-    return height(head->left) - height(head->right);
+    return (head == NULL)? 0: height(head->left) - height(head->right);
 }
 
 Node* insert(Node* node, char* word){
@@ -93,11 +92,11 @@ Node* insert(Node* node, char* word){
     //left right or left left
     if(balance > 1){
         //left left
-        if(balanceFactor(node->left) >0)
+        if(balanceFactor(node->left) >= 0){
             return RR(node);
+        }
         //left right
-        else if(balanceFactor(node->left) < 0)
-        {
+        else{
             node->left = LR(node->left);
             return RR(node);
         }
@@ -105,12 +104,12 @@ Node* insert(Node* node, char* word){
     //right right or right left
     else if(balance < -1){
         //right right
-        if (balanceFactor(node->right) < 0){
+        if (balanceFactor(node->right) <= 0){
             return LR(node);
         }
         //right left
-        else if(strcmp(word, node->right->string) < 0){
-            node->left = RR(node->left);
+        else {
+            node->right = RR(node->right);
             return LR(node);
         }
     }
