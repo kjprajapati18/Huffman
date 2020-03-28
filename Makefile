@@ -10,7 +10,9 @@ minheap.o: minheap.c
 a.out:
 	make all
 
-buildTest: a.out test.txt
+buildTest: test.txt
+	make clean
+	make all
 	./a.out -b test.txt
 
 clean:
