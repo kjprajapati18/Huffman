@@ -15,7 +15,12 @@ int height(Node*);
 Node* makeNode(char*);
 Node* RR(Node*);
 Node* LR(Node*);
+int balanceFactor(Node*);
 Node* insert(Node*, char*);
+void freeAvl(Node*);
+void printPreOrder(Node*);
+void print2DUtil(Node* root, int space);
+void print2D(Node* root);
 
 
 #endif

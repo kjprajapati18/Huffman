@@ -2,7 +2,23 @@
 #include <stdio.h>
 #include <string.h>
 #include "avl.h"
-
+#define COUNT 10
+int main(int argc, char* argv[]){
+    char* test1 = "test1";
+    char* test2 = "test2";
+    char* test3 = "add";
+    char* test4 = "badd";
+    char* test5 = "aed";
+    char* test6 = "aee";
+    Node* head = NULL;
+    head = insert(head, test1);
+    head = insert(head, test2);
+    head = insert(head, test3);
+    head = insert(head, test4);
+    head = insert(head, test5);
+    head = insert(head, test6);
+    print2D(head);
+}
 //helper method to find max of 2 numbers. returns 2nd number if equal
 int max(int a, int b){
     return (a>b)? a: b;
@@ -22,7 +38,7 @@ Node* makeNode(char* word){
     newNode->val = 1;
     newNode->left = NULL;
     newNode->right = NULL;
-    newNode->height = 1;
+    newNode->height = 0;
     return newNode;
 }
 //right rotation helper method to help with rebalancing
@@ -53,7 +69,7 @@ Node* LR(Node* head){
     return newHead;
 }
 
-int balance(Node* head){
+int balanceFactor(Node* head){
     if(head == NULL) return 0;
     return height(head->left) - height(head->right);
 }
@@ -72,14 +88,15 @@ Node* insert(Node* node, char* word){
     }
 
     node->height = 1 + max(height(node->left), height(node->right));
-    int balance = balance(node);
+    int balance = balanceFactor(node);
+    printf("\n\nBalance Factor: %d\n\n", balance);
     //left right or left left
     if(balance > 1){
         //left left
-        if(strcmp(word, node->left->string) < 0)
+        if(balanceFactor(node->left) >0)
             return RR(node);
         //left right
-        else if(strcmp(word, node->left->string) > 0)
+        else if(balanceFactor(node->left) < 0)
         {
             node->left = LR(node->left);
             return RR(node);
@@ -88,15 +105,16 @@ Node* insert(Node* node, char* word){
     //right right or right left
     else if(balance < -1){
         //right right
-        if (strcmp(word, node->right->string) > 0){
+        if (balanceFactor(node->right) < 0){
             return LR(node);
         }
         //right left
-        else if(strcmp(word, node->right->string) < 0){
-            node->left = RR(node-left);
+        else if(balanceFactor(node->right) >0){
+            node->left = RR(node->left);
             return LR(node);
         }
     }
+    printf("Inserted %s\n", word);
     return node;
 }
 
@@ -106,4 +124,31 @@ void freeAvl(Node* head){
     free(head);
     freeAvl(l);
     freeAvl(r);
+}
+
+void printPreOrder(Node* root){
+    if(root != NULL){
+        printf("%s\n", root->string);
+        printPreOrder(root->left);
+        printPreOrder(root->right);
+    }
+}
+
+void print2DUtil(Node* root, int space){
+    if (root == NULL){
+        return;
+    }
+    space += COUNT;
+    print2DUtil(root->right, space);
+    printf("\n");
+    int i;
+    for(i = COUNT; i < space; i++){
+        printf(" ");
+    }
+    printf("%s\n", root->string);
+    print2DUtil(root->left, space);
+}
+
+void print2D(Node* root){
+    print2DUtil(root, 0);
 }
