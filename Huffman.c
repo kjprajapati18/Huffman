@@ -13,6 +13,7 @@
 #include <ctype.h>
 
 #include "avl.h"
+#include "minheap.h"
 #define _ESCAPECHAR '\\'
 /* TO DO LIST:::::::::::
 
@@ -27,6 +28,7 @@ int flagCheck(char* argv[]);
 void printFiles(DIR* directory, char* path);
 void errorPrint(const char* message, int exitCode);
 int fillAVL(Node** head, int fd, char** escapeChar);
+int writeCodebook(treeNode* head, char* escapeChar);
 int incEscapeChar(char** escapeChar, int* escapeCharSize);
 void print2DTree(Node* root, int space);
 int recursive = 0, build = 0, compress = 0, decomp = 0;
@@ -75,13 +77,19 @@ int main(int argc, char* argv[]){
     if(head !=NULL) print2DTree(head, 0);
     else printf("\nHead is null\n");
     
+    //Put build huffman here
+    treeNode* head = NULL;
+    //
+    //////////////////////////
+    writeCodebook(head, escapeChar);
+
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
         if(codebook < 0) errorPrint("Could not open codebook", 1);
     }
 
-    printf("\n\n%s\n", escapeChar);
     free(escapeChar);
+    close(input);
     return 0;
 }
 
@@ -89,10 +97,9 @@ int main(int argc, char* argv[]){
 int flagCheck(char* argv[]){
     int pos;
 
-    for(pos = 1; pos < 3; pos++){
-        if(*argv[pos] == '-'){
-            //Check which flag
-            switch (*(argv[pos]+1)){
+    for(pos = 1; pos < 3; pos++){       //there can only be at most 2 flags and they must be the first 2 args
+        if(*argv[pos] == '-'){          //Check if its a flag
+            switch (*(argv[pos]+1)){    //Check which flag and set appropriate variable
                 case 'b':
                     printf("Using Build Huffman Codebook Flag\n");
                     build = 1;
@@ -113,7 +120,7 @@ int flagCheck(char* argv[]){
         }
     }
 
-    return build + compress + decomp;
+    return build + compress + decomp;   //return the sum so that we can check if a valid flag was picked ??????????????????????????? Maybe put the checks in here for clarity (use exit)
 }
 
 //prints all files in a given directory and all subdirectories
@@ -178,8 +185,6 @@ int fillAVL(Node** head, int fd, char** escapeChar){
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
 	        if (isspace(buffer[i])){
                 delimiter[0] = buffer[i];
-                if(delimiter[0] == '\n') printf("newline\n");
-                else printf("%s\n",delimiter);
                 list = insert(list, delimiter);
                 buffer[i] = '\0';
 
@@ -194,14 +199,12 @@ int fillAVL(Node** head, int fd, char** escapeChar){
                     if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
                         incEscapeChar(escapeChar, &escapeCharSize);
                     }
-                    printf("%s\n",carryOver);
                     list = insert(list, carryOver);
                     carryOverSize = 0;
                 } else {
                     if(i-startIndex == escapeCharSize+1 && strncmp(buffer+startIndex,*escapeChar,escapeCharSize)==0){
                         incEscapeChar(escapeChar, &escapeCharSize);
                     }
-                    printf("%s\n",buffer+startIndex);
                     list = insert(list, buffer+startIndex);
                 }
 
@@ -232,29 +235,11 @@ int fillAVL(Node** head, int fd, char** escapeChar){
         if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
             incEscapeChar(escapeChar, &escapeCharSize);
         }
-        printf("%s\n",carryOver);
         list = insert(list, carryOver);
     }
     free(carryOver);
     *head =list;
     return 0;
-  /*
-  ptr = list->first;
-  while(ptr != NULL){
-    for(i =0; i < strlen(ptr->value); i++){
-      if(isspace((ptr->value)[i])){
-	char buff[strlen(ptr->value) - i];
-	(ptr->value)[i] = '\0';
-	strcpy(buff, ptr->value + i + 1);
-	strcat(ptr->value, buff);
-	i--;
-      }
-    }
-    ptr = ptr->next;
-  }
-
-  if(broke == 1) return 0;
-  return 1;*/
 }
 
 int incEscapeChar(char** escapeChar, int* escapeCharSize){
@@ -274,28 +259,10 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
 
 }
 
+int writeCodebook(treeNode* head, char* escapeChar){
 
-/*void print2DTree(Node *root, int space) 
-{ 
-    // Base case 
-    if (root == NULL) 
-        return; 
-  
-    // Increase distance between levels 
-    space += 10; 
-
-    // Process right child first 
-    print2DTree(root->right, space); 
-  
-    // Print current node after space 
-    // count 
-    printf("\n");
-    int i; 
-    for (i = 10; i < space; i++) 
-        printf(" ");
-    if(strcmp(" ", root->string) == 0) printf("[space]\n");
-    else printf("%s\n", root->string); 
-  
-    // Process left child 
-    print2DTree(root->left, space); 
-}*/
+    int fd = open("./HuffmanCodebook", O_WRONLY | O_CREAT);
+    printf("\ncodebook opened\n");
+    close(fd);
+    return 0;
+}
