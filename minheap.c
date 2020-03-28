@@ -4,7 +4,7 @@
 #include "minheap.h"
 #include "avl.h"
 
-int main(int argc, char* argv[]){
+/*int main(int argc, char* argv[]){
     treeNode* test1 = (treeNode*) malloc(sizeof(treeNode));
     treeNode* test2 = (treeNode*) malloc(sizeof(treeNode));
     test1->freq = 10;
@@ -15,7 +15,7 @@ int main(int argc, char* argv[]){
     for(i = 0; i < HeapSize; i++){
         printf("%d\n", minHeap[i]->freq);
     }
-}
+}*/
 void swap(treeNode** a, treeNode** b){
     treeNode* temp = *a;
     *a = *b;
@@ -46,7 +46,7 @@ void heapify(treeNode* minHeap[], int node){
         }
         if(minIndex != node){
             swap(&minHeap[node], &minHeap[minIndex]);
-            heapify(minIndex);
+            heapify(minHeap, minIndex);
         }
     }
 
@@ -62,7 +62,7 @@ void insertHeap(treeNode* minHeap[], treeNode* newNode){
         HeapSize+=1;
         int i = HeapSize/2 -1;
         for (i; i >= 0; i--){
-            heapify(i);
+            heapify(minHeap, i);
         }
     }
 }
@@ -72,7 +72,7 @@ treeNode* pop(treeNode* minHeap[]){
     HeapSize-=1;
     int i;
     for(i = HeapSize/2 -1; i >=0; i--){
-        heapify(i);
+        heapify(minHeap, i);
     }
     return minHeap[HeapSize];
 }

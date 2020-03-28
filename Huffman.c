@@ -80,11 +80,14 @@ int main(int argc, char* argv[]){
     //Put build huffman here
     //treeNode* head = NULL;
     treeNode* minHeap[tokens];
-
+    fillMinHeapArray(minHeap, head, 0);
+    for(int i = tokens -1; i >= 0; i --){
+        heapify(minHeap), i);
+    }
     //
     //////////////////////////
-
-    writeCodebook(minHeap[0], escapeChar);
+    
+    writeCodebook(head, escapeChar);
 
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
