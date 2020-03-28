@@ -22,7 +22,7 @@ void swap(treeNode** a, treeNode** b){
     *b = temp;
 }
 
-void heapify(int node){
+void heapify(treeNode* minHeap[], int node){
     if (HeapSize == 1){
         printf("single element heap");
     }
@@ -52,7 +52,7 @@ void heapify(int node){
 
 }
 
-void insertHeap(treeNode* newNode){
+void insertHeap(treeNode* minHeap[], treeNode* newNode){
     if(HeapSize == 0){
         minHeap[0] = newNode;
         HeapSize+=1;
@@ -67,7 +67,7 @@ void insertHeap(treeNode* newNode){
     }
 }
 
-treeNode* pop(){
+treeNode* pop(treeNode* minHeap[]){
     swap(&minHeap[0], &minHeap[HeapSize -1]);
     HeapSize-=1;
     int i;

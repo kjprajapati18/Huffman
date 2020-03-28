@@ -35,7 +35,7 @@ int recursive = 0, build = 0, compress = 0, decomp = 0;
 
 
 int main(int argc, char* argv[]){
-
+    tokens = 0;
     Node* head = NULL;      //AVL head. Storing inputs for buildTree
 
     //Check for valid inputs
@@ -78,11 +78,13 @@ int main(int argc, char* argv[]){
     else printf("\nHead is null\n");
     
     //Put build huffman here
-    treeNode* huffHead = NULL;
+    //treeNode* head = NULL;
+    treeNode* minHeap[tokens];
+
     //
     //////////////////////////
 
-    writeCodebook(huffHead, escapeChar);
+    writeCodebook(minHeap[0], escapeChar);
 
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
@@ -266,4 +268,17 @@ int writeCodebook(treeNode* head, char* escapeChar){
     printf("\ncodebook opened\n");
     close(fd);
     return 0;
+}
+
+int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){
+    if(root == NULL) return count;
+    treeNode* newNode = (treeNode*) malloc(sizeof(treeNode));
+    newNode->freq = root->val;
+    newNode->token = root->string;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    minHeap[count] = newNode;
+    count++;
+    count = fillMinHeapArray(minHeap, root->left, count);
+    count = fillMinHeapArray(minHeap, root->right, count);
 }

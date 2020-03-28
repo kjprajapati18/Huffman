@@ -9,18 +9,16 @@ typedef struct treeNode{
     struct treeNode* right;
 }treeNode;
 
-//minheap array
-treeNode* minHeap[100];
 //size of heap
 int HeapSize = 0;
 //heapify method
-void heapify(int);
+void heapify(treeNode**, int);
 
 //insert method
-void insertHeap(treeNode*);
+void insertHeap(treeNode**, treeNode*);
 
 //delete root method
-treeNode* pop();
+treeNode* pop(treeNode**);
 
 //swap function
 void swap(treeNode**, treeNode**);

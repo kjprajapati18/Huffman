@@ -22,4 +22,6 @@ void printPreOrder(Node*);
 void print2DTree(Node* root, int space);
 
 
+int tokens;
+
 #endif

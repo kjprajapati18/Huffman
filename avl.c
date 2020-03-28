@@ -4,7 +4,6 @@
 #include "avl.h"
 #define COUNT 10
 
-int tokens = 0;
 /*int main(int argc, char* argv[]){
     char* test1 = "test1";
     char* test2 = "test2";
