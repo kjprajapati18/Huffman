@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "avl.h"
 /* TO DO LIST:::::::::::
@@ -64,7 +65,8 @@ int main(int argc, char* argv[]){
     int inputCheck = fillAVL(&head, input);
     if(inputCheck == -1) errorPrint("FATAL ERROR: Could not fully finish tree", 1);
     
-    print2DTree(head, 0);
+    if(head !=NULL) print2DTree(head, 0);
+    else printf("\nHead is null\n");
     
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
@@ -146,6 +148,8 @@ int fillAVL(Node** head, int fd){
     char buffer[201];
     int i = 0;
     int broke = 0;
+    char delimiter[2];      //Takes care of adding whitespaces
+    delimiter[1] = '\0';
 
     //If words aren't complete by the time read returns, we need to carry the word over.
     int carryOverSize = 0;
@@ -161,10 +165,12 @@ int fillAVL(Node** head, int fd){
         int startIndex = 0;
         for(i = 0; i<bytesRead; i++){
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
-	        if (buffer[i] == ' '){
+	        if (isspace(buffer[i])){
+                delimiter[0] = buffer[i];
+                list = insert(list, delimiter);
                 buffer[i] = '\0';
 
-                if(carryOverSize != 0){
+                if(carryOverSize != 0){ //realloc and copy
                     char* temp = (char*) malloc(sizeof(char)*(carryOverSize+(i-startIndex)+1));
                     memcpy(temp, carryOver, carryOverSize);
                     strcat(temp, buffer+startIndex);
@@ -175,8 +181,6 @@ int fillAVL(Node** head, int fd){
                 } else {
                     list = insert(list, buffer+startIndex);
                 }
-
-                list = insert(list, " ");                   //FIX HERE::: If we at EOF, we shouldn't add a space. So theres some edge cases missing here
 
 	            startIndex = i+1;
             }
@@ -192,17 +196,17 @@ int fillAVL(Node** head, int fd){
             } else {
                 carryOverSize += bytesRead-startIndex;
                 char* temp = (char*) malloc(sizeof(char)*(carryOverSize+1));
-                memcpy(temp, carryOver, carryOverSize);
+                memcpy(temp, carryOver, strlen(carryOver)+1);
                 strcat(temp, buffer+startIndex);
                 free(carryOver);
                 carryOver = temp;
             }
         }
-
+        
     }while(bytesRead>0);
     
     if(carryOverSize !=0){
-        insert(list, carryOver);
+        list = insert(list, carryOver);
     }
     free(carryOver);
     *head =list;
