@@ -31,7 +31,7 @@ int flagCheck(char* argv[]);
 void printFiles(DIR* directory, char* path);
 void errorPrint(const char* message, int exitCode);
 int fillAVL(Node** head, int fd, char** escapeChar);
-int writeCodebook(treeNode* head, char* escapeChar);
+int writeCodebook(treeNode* head, int fd, char* escapeChar);
 int incEscapeChar(char** escapeChar, int* escapeCharSize);
 void print2DTree(Node* root, int space);
 int fillMinHeapArray(treeNode* minHeap[], Node* root, int count);
@@ -99,8 +99,10 @@ int main(int argc, char* argv[]){
     printf("%d", HeapSize);
     print2DTreeNode(minHeap[0], 0);
     //////////////////////////
-    
-    writeCodebook(minHeap[0], escapeChar);
+
+    remove("./HuffmanCodebook");
+    int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT);
+    writeCodebook(minHeap[0], book, escapeChar);
 
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
@@ -109,6 +111,7 @@ int main(int argc, char* argv[]){
 
     free(escapeChar);
     close(input);
+    close(book);
     return 0;
 }
 
@@ -278,11 +281,9 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
 
 }
 
-int writeCodebook(treeNode* head, char* escapeChar){
+int writeCodebook(treeNode* head, int fd, char* escapeChar){
 
-    int fd = open("./HuffmanCodebook", O_WRONLY | O_CREAT);
     printf("\ncodebook opened\n");
-    close(fd);
     return 0;
 }
 
