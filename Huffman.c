@@ -36,7 +36,7 @@ int recursive = 0, build = 0, compress = 0, decomp = 0;
 
 int main(int argc, char* argv[]){
 
-    Node* head = NULL;
+    Node* head = NULL;      //AVL head. Storing inputs for buildTree
 
     //Check for valid inputs
     if(argc < 3) errorPrint("Fatal Error: Not enough arguments", 1);
@@ -81,6 +81,7 @@ int main(int argc, char* argv[]){
     treeNode* head = NULL;
     //
     //////////////////////////
+    
     writeCodebook(head, escapeChar);
 
     if(compress + decomp){
