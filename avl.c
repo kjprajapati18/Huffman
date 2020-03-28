@@ -3,7 +3,7 @@
 #include <string.h>
 #include "avl.h"
 #define COUNT 10
-int main(int argc, char* argv[]){
+/*int main(int argc, char* argv[]){
     char* test1 = "test1";
     char* test2 = "test2";
     char* test3 = "add";
@@ -12,13 +12,18 @@ int main(int argc, char* argv[]){
     char* test6 = "aee";
     Node* head = NULL;
     head = insert(head, test1);
+    print2DTree(head, 0);
     head = insert(head, test2);
+    print2DTree(head, 0);
     head = insert(head, test3);
+    print2DTree(head, 0);
     head = insert(head, test4);
+    print2DTree(head, 0);
     head = insert(head, test5);
+    print2DTree(head, 0);
     head = insert(head, test6);
     print2DTree(head, 0);
-}
+}*/
 //helper method to find max of 2 numbers. returns 2nd number if equal
 int max(int a, int b){
     return (a>b)? a: b;
@@ -37,7 +42,7 @@ Node* makeNode(char* word){
     newNode->val = 1;
     newNode->left = NULL;
     newNode->right = NULL;
-    newNode->height = 0;
+    newNode->height = 1;
     return newNode;
 }
 
@@ -94,6 +99,7 @@ Node* insert(Node* node, char* word){
         //left left
         if(balanceFactor(node->left) >= 0){
             return RR(node);
+            
         }
         //left right
         else{
@@ -143,7 +149,7 @@ void print2DTree(Node *root, int space)
     for (i = 10; i < space; i++) 
         printf(" ");
     if(strcmp(" ", root->string) == 0) printf("[space]\n");
-    else printf("%s\n", root->string); 
+    else printf("%s%d\n", root->string,root->height); 
   
     // Process left child 
     print2DTree(root->left, space); 
