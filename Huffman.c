@@ -10,8 +10,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "avl.h"
+#define _ESCAPECHAR '\\'
 /* TO DO LIST:::::::::::
 
     -Add checks for every malloc                                        (cuz he's reading our code)
@@ -24,7 +26,8 @@
 int flagCheck(char* argv[]);
 void printFiles(DIR* directory, char* path);
 void errorPrint(const char* message, int exitCode);
-int fillAVL(Node** head, int fd);
+int fillAVL(Node** head, int fd, char** escapeChar);
+int incEscapeChar(char** escapeChar, int* escapeCharSize);
 void print2DTree(Node* root, int space);
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
@@ -61,15 +64,24 @@ int main(int argc, char* argv[]){
     //Finish up later
     int input = open(argv[2], O_RDONLY);
     if(input < 0) errorPrint("Could not open input file", 1);
-    int inputCheck = fillAVL(&head, input);
+
+    char* escapeChar = (char*) malloc(sizeof(char)*2);
+    escapeChar[0] = _ESCAPECHAR;
+    escapeChar[1] = '\0';
+
+    int inputCheck = fillAVL(&head, input, &escapeChar);
     if(inputCheck == -1) errorPrint("FATAL ERROR: Could not fully finish tree", 1);
     
-    print2DTree(head, 0);
+    if(head !=NULL) print2DTree(head, 0);
+    else printf("\nHead is null\n");
     
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
         if(codebook < 0) errorPrint("Could not open codebook", 1);
     }
+
+    printf("\n\n%s\n", escapeChar);
+    free(escapeChar);
     return 0;
 }
 
@@ -138,7 +150,7 @@ void errorPrint(const char* message, int exitCode){
 
 
 //Reader function to get input from files
-int fillAVL(Node** head, int fd){
+int fillAVL(Node** head, int fd, char** escapeChar){
 
     Node* list = *head;
     int bytesRead = 1;
@@ -146,9 +158,12 @@ int fillAVL(Node** head, int fd){
     char buffer[201];
     int i = 0;
     int broke = 0;
+    char delimiter[2];      //Takes care of adding whitespaces
+    delimiter[1] = '\0';
 
     //If words aren't complete by the time read returns, we need to carry the word over.
     int carryOverSize = 0;
+    int escapeCharSize = 1;
     char* carryOver = (char*) malloc(sizeof(char)); //Initialize with size 1 byte because the loop starts with freeing the old value.
     *carryOver = '\0';
   
@@ -161,22 +176,33 @@ int fillAVL(Node** head, int fd){
         int startIndex = 0;
         for(i = 0; i<bytesRead; i++){
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
-	        if (buffer[i] == ' '){
+	        if (isspace(buffer[i])){
+                delimiter[0] = buffer[i];
+                printf("%s\n",delimiter);
+                list = insert(list, delimiter);
                 buffer[i] = '\0';
 
-                if(carryOverSize != 0){
-                    char* temp = (char*) malloc(sizeof(char)*(carryOverSize+(i-startIndex)+1));
-                    memcpy(temp, carryOver, carryOverSize);
+                if(carryOverSize != 0){ //realloc, add tree, check/change escape char
+                    carryOverSize += i-startIndex;
+                    char* temp = (char*) malloc(sizeof(char)*(carryOverSize+1));
+                    memcpy(temp, carryOver, carryOverSize-(i-startIndex)+1);
                     strcat(temp, buffer+startIndex);
                     free(carryOver);
                     carryOver = temp;
+
+                    if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
+                        incEscapeChar(escapeChar, &escapeCharSize);
+                    }
+                    printf("%s\n",carryOver);
                     list = insert(list, carryOver);
                     carryOverSize = 0;
                 } else {
+                    if(i-startIndex == escapeCharSize+1 && strncmp(buffer+startIndex,*escapeChar,escapeCharSize)==0){
+                        incEscapeChar(escapeChar, &escapeCharSize);
+                    }
+                    printf("%s\n",buffer+startIndex);
                     list = insert(list, buffer+startIndex);
                 }
-
-                list = insert(list, " ");                   //FIX HERE::: If we at EOF, we shouldn't add a space. So theres some edge cases missing here
 
 	            startIndex = i+1;
             }
@@ -192,17 +218,21 @@ int fillAVL(Node** head, int fd){
             } else {
                 carryOverSize += bytesRead-startIndex;
                 char* temp = (char*) malloc(sizeof(char)*(carryOverSize+1));
-                memcpy(temp, carryOver, carryOverSize);
+                memcpy(temp, carryOver, strlen(carryOver)+1);
                 strcat(temp, buffer+startIndex);
                 free(carryOver);
                 carryOver = temp;
             }
         }
-
+        
     }while(bytesRead>0);
     
     if(carryOverSize !=0){
-        insert(list, carryOver);
+        if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
+            incEscapeChar(escapeChar, &escapeCharSize);
+        }
+        printf("%s\n",carryOver);
+        list = insert(list, carryOver);
     }
     free(carryOver);
     *head =list;
@@ -224,6 +254,23 @@ int fillAVL(Node** head, int fd){
 
   if(broke == 1) return 0;
   return 1;*/
+}
+
+int incEscapeChar(char** escapeChar, int* escapeCharSize){
+
+    if(escapeChar == NULL) return -1;
+    *escapeCharSize *= 2;
+    char* temp = (char*) malloc(sizeof(char)* (*(escapeCharSize)+1));
+    if(temp == NULL) return 1;
+    
+    int i;
+    for(i = 0; i<*escapeCharSize; i++) temp[i] = _ESCAPECHAR;
+    temp[*escapeCharSize] = '\0';
+    
+    free(*escapeChar);
+    *escapeChar = temp;
+    return 0;
+
 }
 
 
