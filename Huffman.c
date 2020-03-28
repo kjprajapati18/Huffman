@@ -1,3 +1,6 @@
+//TODO list:
+//heap: insert method, remove method, array of treenode*
+//tree: tree nodes: treeNodes
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -232,7 +235,7 @@ int fillAVL(Node** head, int fd){
   
     // Increase distance between levels 
     space += 10; 
-  
+
     // Process right child first 
     print2DTree(root->right, space); 
   
