@@ -49,7 +49,7 @@ Node* RR(Node* head){
     head->left = changes;
     newHead->right = head;
 
-    head->height = max(height(head->left), height(head->right));
+    head->height = max(height(head->left), height(head->right));                        //HEIGHT +1??????????????????????????????????????????????????????????????
     newHead->height = max(height(newHead->left), height(newHead->right));
 
     return newHead;
@@ -109,7 +109,7 @@ Node* insert(Node* node, char* word){
             return LR(node);
         }
         //right left
-        else if(balanceFactor(node->right) >0){
+        else if(strcmp(word, node->right->string) < 0){
             node->left = RR(node->left);
             return LR(node);
         }
@@ -122,33 +122,6 @@ void freeAvl(Node* head){
     Node* l = head->left;
     Node* r = head->right;
     free(head);
-    freeAvl(l);
-    freeAvl(r);
-}
-
-void printPreOrder(Node* root){
-    if(root != NULL){
-        printf("%s\n", root->string);
-        printPreOrder(root->left);
-        printPreOrder(root->right);
-    }
-}
-
-void print2DUtil(Node* root, int space){
-    if (root == NULL){
-        return;
-    }
-    space += COUNT;
-    print2DUtil(root->right, space);
-    printf("\n");
-    int i;
-    for(i = COUNT; i < space; i++){
-        printf(" ");
-    }
-    printf("%s\n", root->string);
-    print2DUtil(root->left, space);
-}
-
-void print2D(Node* root){
-    print2DUtil(root, 0);
+    if(l != NULL) freeAvl(l);
+    if(r != NULL) freeAvl(r);
 }
