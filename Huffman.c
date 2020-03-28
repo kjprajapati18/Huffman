@@ -78,11 +78,11 @@ int main(int argc, char* argv[]){
     else printf("\nHead is null\n");
     
     //Put build huffman here
-    treeNode* head = NULL;
+    treeNode* huffHead = NULL;
     //
     //////////////////////////
-    
-    writeCodebook(head, escapeChar);
+
+    writeCodebook(huffHead, escapeChar);
 
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
