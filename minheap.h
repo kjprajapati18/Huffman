@@ -26,6 +26,8 @@ void swap(treeNode**, treeNode**);
 //tree merge
 treeNode* merge(treeNode*, treeNode*);
 
+void freeHuff(treeNode*);
+
 //tree print
 void print2DTreeNode(treeNode*, int);
 #endif

@@ -129,10 +129,12 @@ Node* insert(Node* node, char* word){
 void freeAvl(Node* head){
     Node* l = head->left;
     Node* r = head->right;
+    free(head->string);
     free(head);
     if(l != NULL) freeAvl(l);
     if(r != NULL) freeAvl(r);
 }
+
 void print2DTree(Node *root, int space) 
 { 
     // Base case 

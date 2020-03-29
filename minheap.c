@@ -84,6 +84,14 @@ treeNode* merge(treeNode* less, treeNode* great){
     return newNode;
 }
 
+void freeHuff(treeNode* head){
+    treeNode* l = head->left;
+    treeNode* r = head->right;
+    free(head);
+    if(l != NULL) freeHuff(l);
+    if(r != NULL) freeHuff(r);
+}
+
 void print2DTreeNode(treeNode *root, int space) 
 { 
     // Base case 

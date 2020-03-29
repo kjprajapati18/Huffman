@@ -101,7 +101,7 @@ int main(int argc, char* argv[]){
     printf("%d", HeapSize);
     print2DTreeNode(minHeap[0], 0);
     //////////////////////////
-
+    freeAvl(head);
     remove("./HuffmanCodebook");
     int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT);
     writeString(book, escapeChar);
@@ -114,6 +114,7 @@ int main(int argc, char* argv[]){
     }
 
     free(escapeChar);
+    freeHuff(minHeap[0]);
     close(input);
     close(book);
     return 0;
