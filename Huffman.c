@@ -293,20 +293,20 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
         char* temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));    //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
 
         memcpy(temp, bitString, bitLength);
-        temp[bitLength+1] = '\t';
-        temp[bitLength+2] = '\0';
+        temp[bitLength] = '\t';
+        temp[bitLength+1] = '\0';
 
         int booleanIsSpace = isspace(head->token[0]) && strcmp(head->token, " ");      //Is a control character space
 
         //Just need to finish writeString function && escapeCharHandler function
         char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
 
-        strcpy(temp, inputtedToken);
-        strcpy(temp, "\n");
+        strcat(temp, inputtedToken);
+        strcat(temp, "\n");
 
         writeString(fd, temp);
         free(temp);
-        free(bitString);
+        
         if(booleanIsSpace) free(inputtedToken);
         return 0;
     }
@@ -317,6 +317,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
     newString[bitLength+1] = '\0';
     
     newString[bitLength] = '0';
+    int stringLength = strlen(newString);
     writeCodebook(head->left, fd, escapeChar, newString);
 
     newString[bitLength] = '1';
@@ -344,7 +345,7 @@ int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){   //Fills arra
 
 int writeString(int fd, char* string){
 
-    int size = strlen(string)+1, written = 0, status = 0;
+    int size = strlen(string), written = 0, status = 0;
 
     do{
         status = write(fd, string+written, size-written);
