@@ -101,9 +101,8 @@ int main(int argc, char* argv[]){
     printf("%d", HeapSize);
     print2DTreeNode(minHeap[0], 0);
     //////////////////////////
-    freeAvl(head);
     remove("./HuffmanCodebook");
-    int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT);
+    int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00600);
     writeString(book, escapeChar);
     writeString(book, "\n");
     writeCodebook(minHeap[0], book, escapeChar, "");
@@ -113,6 +112,7 @@ int main(int argc, char* argv[]){
         if(codebook < 0) errorPrint("Could not open codebook", 1);
     }
 
+    freeAvl(head);
     free(escapeChar);
     freeHuff(minHeap[0]);
     close(input);
