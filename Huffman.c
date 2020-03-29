@@ -36,6 +36,7 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize);
 void print2DTree(Node* root, int space);
 int fillMinHeapArray(treeNode* minHeap[], Node* root, int count);
 int writeString(int fd, char* string);
+char* escapeCharHandler(char* escapeChar, char* token);
 
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
@@ -105,7 +106,7 @@ int main(int argc, char* argv[]){
     int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT);
     writeString(book, escapeChar);
     writeString(book, "\n");
-    //writeCodebook(minHeap[0], book, escapeChar, "");
+    writeCodebook(minHeap[0], book, escapeChar, "");
 
     if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
@@ -295,15 +296,10 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
         temp[bitLength+1] = '\t';
         temp[bitLength+2] = '\0';
 
-        //Just need to finish writeString function && escapeCharHandler function************************************************************************************************
-        //**********************************************************************************************************************************************************************
-        //**********************************************************************************************************************************************************************
-        //**********************************************************************************************************************************************************************
-        char* inputtedToken = isspace(head->token)? escapeCharHandler(escapeChar, head->token) : head->token;
-        //**********************************************************************************************************************************************************************
-        //**********************************************************************************************************************************************************************
-        //**********************************************************************************************************************************************************************
+        int booleanIsSpace = isspace(head->token[0]) && strcmp(head->token, " ");      //Is a control character space
 
+        //Just need to finish writeString function && escapeCharHandler function
+        char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
 
         strcpy(temp, inputtedToken);
         strcpy(temp, "\n");
@@ -311,11 +307,12 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
         writeString(fd, temp);
         free(temp);
         free(bitString);
+        if(booleanIsSpace) free(inputtedToken);
         return 0;
     }
 
     //If this point is reached, then there are children. Note that Huffman trees are strictly binary
-    char* newString = malloc(sizeof(char) * (bitLength+2));
+    char* newString = (char *) malloc(sizeof(char) * (bitLength+2));
     memcpy(newString, bitString, bitLength+1);
     newString[bitLength+1] = '\0';
     
@@ -345,4 +342,40 @@ int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){   //Fills arra
     return count;
 }
 
-int writeString()
+int writeString(int fd, char* string){
+
+    int size = strlen(string)+1, written = 0, status = 0;
+
+    do{
+        status = write(fd, string+written, size-written);
+        written += status;
+        if(status <0) return -1;
+    }while(written != size);
+
+    return 0;
+}
+
+char* escapeCharHandler(char* escapeChar, char* token){
+
+    int size = strlen(escapeChar);
+    char* controlString = (char*) malloc(sizeof(char) * (size+2));
+    memcpy(controlString, escapeChar, size+1);
+    controlString[size+1] = '\0';
+
+    switch (token[0]){
+        case '\t':
+            controlString[size] = 't';
+            break;
+        case '\n':
+            controlString[size] = 'n';
+            break;
+        case '\r':
+            controlString[size] = 'r';
+            break;
+        default:
+            break;
+    }
+
+    return controlString;
+
+}
