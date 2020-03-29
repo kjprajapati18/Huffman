@@ -32,5 +32,5 @@ void freeHuff(treeNode*);
 void print2DTreeNode(treeNode*, int);
 
 //fill min heap array with tokens from avl tree
-int fillMinHeapArray(treeNode*, Node*, int);
+int fillMinHeapArray(treeNode**, Node*, int);
 #endif
