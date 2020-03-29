@@ -29,18 +29,6 @@
     -Pop with siftDown
 
 */
-/*
-int flagCheck(char* argv[]);
-void printFiles(DIR* directory, char* path);
-void errorPrint(const char* message, int exitCode);
-int fillAVL(Node** head, int fd, char** escapeChar);
-int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString);
-int incEscapeChar(char** escapeChar, int* escapeCharSize);
-void print2DTree(Node* root, int space);
-int fillMinHeapArray(treeNode* minHeap[], Node* root, int count);
-int writeString(int fd, char* string);
-char* escapeCharHandler(char* escapeChar, char* token);
-*/
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
 
