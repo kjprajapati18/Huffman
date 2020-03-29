@@ -1,7 +1,10 @@
 #ifndef INPUTHANDLER_H
 #define INPUTHANDLER_H
 #include "avl.h"
-#include "minheap.h"
+
+//input flags global
+int recursive, build, compress, decomp;
+
 
 //checks the first 2 flags to see what we're doing and if it's recursive or not
 int flagCheck(char**);

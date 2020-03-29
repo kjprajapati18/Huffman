@@ -29,8 +29,6 @@
     -Pop with siftDown
 
 */
-int recursive = 0, build = 0, compress = 0, decomp = 0;
-
 
 int main(int argc, char* argv[]){
     tokens = 0;
@@ -71,15 +69,14 @@ int main(int argc, char* argv[]){
 
     int inputCheck = fillAVL(&head, input, &escapeChar);
     if(inputCheck == -1) errorPrint("FATAL ERROR: Could not fully finish tree", 1);
-    
-    //if(head !=NULL) print2DTree(head, 0);
-    //else printf("\nHead is null\n");
+    if(head !=NULL) print2DTree(head, 0);
+    else printf("\nHead is null\n");
     
     //Put build huffman here
-    
+    HeapSize = tokens;
     treeNode* minHeap[HeapSize];
     fillMinHeapArray(minHeap, head, 0);
-    HeapSize = tokens;
+    
     int i;
     for(i = tokens -1; i >= 0; i --){
         heapify(minHeap, i);
@@ -90,8 +87,8 @@ int main(int argc, char* argv[]){
         treeNode* newNode = merge(less, great);
         insertHeap(minHeap, newNode);
     }
-    //printf("%d", HeapSize);
-    //print2DTreeNode(minHeap[0], 0);
+    printf("%d", HeapSize);
+    print2DTreeNode(minHeap[0], 0);
     //////////////////////////
     remove("./HuffmanCodebook");
     int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00600);

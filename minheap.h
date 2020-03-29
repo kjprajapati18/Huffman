@@ -1,6 +1,7 @@
 #ifndef MINHEAP_H
 #define MINHEAP_H
 #include "avl.h"
+
 //nodes that are stored in minheap
 typedef struct treeNode{
     int freq;
