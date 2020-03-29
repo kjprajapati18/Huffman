@@ -14,6 +14,8 @@
 
 #include "avl.h"
 #include "minheap.h"
+#include "codebookWriter.h"
+#include "inputHandler.h"
 #define _ESCAPECHAR '\\'
 /* TO DO LIST:::::::::::
 
@@ -27,6 +29,7 @@
     -Pop with siftDown
 
 */
+/*
 int flagCheck(char* argv[]);
 void printFiles(DIR* directory, char* path);
 void errorPrint(const char* message, int exitCode);
@@ -37,7 +40,7 @@ void print2DTree(Node* root, int space);
 int fillMinHeapArray(treeNode* minHeap[], Node* root, int count);
 int writeString(int fd, char* string);
 char* escapeCharHandler(char* escapeChar, char* token);
-
+*/
 int recursive = 0, build = 0, compress = 0, decomp = 0;
 
 
@@ -81,13 +84,14 @@ int main(int argc, char* argv[]){
     int inputCheck = fillAVL(&head, input, &escapeChar);
     if(inputCheck == -1) errorPrint("FATAL ERROR: Could not fully finish tree", 1);
     
-    if(head !=NULL) print2DTree(head, 0);
-    else printf("\nHead is null\n");
+    //if(head !=NULL) print2DTree(head, 0);
+    //else printf("\nHead is null\n");
     
     //Put build huffman here
-    HeapSize = tokens;
+    
     treeNode* minHeap[HeapSize];
     fillMinHeapArray(minHeap, head, 0);
+    HeapSize = tokens;
     int i;
     for(i = tokens -1; i >= 0; i --){
         heapify(minHeap, i);
@@ -98,8 +102,8 @@ int main(int argc, char* argv[]){
         treeNode* newNode = merge(less, great);
         insertHeap(minHeap, newNode);
     }
-    printf("%d", HeapSize);
-    print2DTreeNode(minHeap[0], 0);
+    //printf("%d", HeapSize);
+    //print2DTreeNode(minHeap[0], 0);
     //////////////////////////
     remove("./HuffmanCodebook");
     int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00600);
@@ -121,7 +125,7 @@ int main(int argc, char* argv[]){
 }
 
 //checks the first 2 flags to see what we're doing and if it's recursive or not
-int flagCheck(char* argv[]){
+/*int flagCheck(char* argv[]){
     int pos;
 
     for(pos = 1; pos < 3; pos++){       //there can only be at most 2 flags and they must be the first 2 args
@@ -148,10 +152,10 @@ int flagCheck(char* argv[]){
     }
 
     return build + compress + decomp;   //return the sum so that we can check if a valid flag was picked ??????????????????????????? Maybe put the checks in here for clarity (use exit)
-}
+}*/
 
 //prints all files in a given directory and all subdirectories
-void printFiles(DIR* directory, char* basePath){
+/*void printFiles(DIR* directory, char* basePath){
     //this is kinda hella sus lmfao but it works
     char path[NAME_MAX + strlen(basePath)];
     struct dirent* dir;
@@ -174,17 +178,17 @@ void printFiles(DIR* directory, char* basePath){
         }
         
     }
-}
+}*/
 
 //Make printing error messages a little cleaner
-void errorPrint(const char* message, int exitCode){
+/*void errorPrint(const char* message, int exitCode){
     printf("%s\n", message);
     if(exitCode != 0) exit(exitCode);
-}
+}*/
 
 
 //Reader function to get input from files
-int fillAVL(Node** head, int fd, char** escapeChar){
+/*int fillAVL(Node** head, int fd, char** escapeChar){
 
     Node* list = *head;
     int bytesRead = 1;
@@ -267,9 +271,9 @@ int fillAVL(Node** head, int fd, char** escapeChar){
     free(carryOver);
     *head =list;
     return 0;
-}
+}*/
 
-int incEscapeChar(char** escapeChar, int* escapeCharSize){
+/*int incEscapeChar(char** escapeChar, int* escapeCharSize){
 
     if(escapeChar == NULL) return -1;
     *escapeCharSize *= 2;
@@ -284,9 +288,9 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
     *escapeChar = temp;
     return 0;
 
-}
+}*/
 
-int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
+/*int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
     if(head == NULL) return -1;
     int bitLength = strlen(bitString);
 
@@ -326,11 +330,11 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
 
     free(newString);
     return 0;
-}
+}*/
 
 
 
-int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){   //Fills array with all converted TreeNode tokens from AVL
+/*int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){   //Fills array with all converted TreeNode tokens from AVL
     if(root == NULL) return count;
     treeNode* newNode = (treeNode*) malloc(sizeof(treeNode));
     newNode->freq = root->val;
@@ -342,9 +346,9 @@ int fillMinHeapArray(treeNode* minHeap[], Node* root, int count){   //Fills arra
     count = fillMinHeapArray(minHeap, root->left, count);
     count = fillMinHeapArray(minHeap, root->right, count);
     return count;
-}
+}*/
 
-int writeString(int fd, char* string){
+/*int writeString(int fd, char* string){
 
     int size = strlen(string), written = 0, status = 0;
 
@@ -355,9 +359,9 @@ int writeString(int fd, char* string){
     }while(written != size);
 
     return 0;
-}
+}*/
 
-char* escapeCharHandler(char* escapeChar, char* token){
+/*char* escapeCharHandler(char* escapeChar, char* token){
 
     int size = strlen(escapeChar);
     char* controlString = (char*) malloc(sizeof(char) * (size+2));
@@ -380,4 +384,4 @@ char* escapeCharHandler(char* escapeChar, char* token){
 
     return controlString;
 
-}
+}*/

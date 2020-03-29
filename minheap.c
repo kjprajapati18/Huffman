@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "minheap.h"
-#include "avl.h"
 
 /*int main(int argc, char* argv[]){
     treeNode* test1 = (treeNode*) malloc(sizeof(treeNode));
@@ -117,4 +116,18 @@ void print2DTreeNode(treeNode *root, int space)
   
     // Process left child 
     print2DTreeNode(root->left, space); 
+}
+
+int fillMinHeapArray(treeNode*minHeap[], Node* root, int count){
+    if(root == NULL) return count;
+    treeNode* newNode = (treeNode*) malloc(sizeof(treeNode));
+    newNode->freq = root->val;
+    newNode->token = root->string;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    minHeap[count] = newNode;
+    count++;
+    count = fillMinHeapArray(minHeap, root->left, count);
+    count = fillMinHeapArray(minHeap, root->right, count);
+    return count;
 }
