@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "inputHandler.h"
 
-int flagCheck(char* argv[]){
+int flagCheck(int argc, char* argv[]){
     int pos;
 
     for(pos = 1; pos < 3; pos++){       //there can only be at most 2 flags and they must be the first 2 args
@@ -29,10 +29,21 @@ int flagCheck(char* argv[]){
                     recursive = 1;
                     break;
             }
-        }
+        } else break;
     }
 
-    return build + compress + decomp;   //return the sum so that we can check if a valid flag was picked ??????????????????????????? Maybe put the checks in here for clarity (use exit)
+    int flags = build + compress + decomp;
+    
+    //If the user did not pick build, compress, or decompress, or the user did not have flags as the first argument
+    if(flags != 1) errorPrint("Fatal Error: Invalid flag usage. Make sure to pick exactly 1 flag from the following, and that it comes before any arguments: (-b)uild, (-c)ompress, (-d)ecompress", 1);
+    
+    //build should have 3 arguments and compress/decompress should have 4 flags (+1 if recursive flag included)
+    if((build && argc != 3+recursive) || ((compress + decomp) && argc != 4+recursive)) errorPrint("Fatal Error: Incorrect number of arguments for given flags", 1);
+
+    //Make sure that a proper codebook is given if we are compressing or decompressing
+    if((compress + decomp) && strcmp("HuffmanCodebook", argv[3+recursive])) errorPrint("Fatal Error: The codebook should be called 'HuffmanCodebook.'", 1);
+
+    return 0; //Could turn into a void function
     //NOTE::::::::::::::::::: I WANT TO GET RID OF ALL THESE FLAGS AND TRY TO USE _BUILD/COMPRESS/DECOMPRESS
 }
 

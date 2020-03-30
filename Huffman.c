@@ -37,15 +37,8 @@ int main(int argc, char* argv[]){
     //Check for valid inputs
     if(argc < 3) errorPrint("Fatal Error: Not enough arguments", 1);
 
-    //each flag corresponds to 1 or 0, flags will add up all flags except for the recursive flag
-    int flags = flagCheck(argv);
-    if(flags != 1) errorPrint("Fatal Error: Invalid flag usage. Make sure to pick 1 flag from the following: (b)uild, (c)ompress, (d)ecompress", 1);
-
-    //build should have 3 arguments and compress/decompress should have 4 flags (+1 if recursive flag included)
-    if((build && argc != 3+recursive) || ((compress + decomp) && argc != 4+recursive)) errorPrint("Fatal Error: Incorrect number of arguments for given flags", 1);
-
-    //Make sure that a proper codebook is given
-    if((compress + decomp) && strcmp("HuffmanCodebook", argv[3+recursive])) errorPrint("Fatal Error: The codebook should be called 'HuffmanCodebook.'", 1);
+    //each flag corresponds to 1 or 0. flagCheck will set the proper flags. If there is an error in the input, flagCheck will display error and exit()
+    flagCheck(argc, argv);
 
     //The input is proper in terms of number of arguments and position of each argument. Now try to open the needed items (directory/file/codebook)
     //We can optimize this later by using +recursive on some arguments
@@ -59,7 +52,7 @@ int main(int argc, char* argv[]){
         return 0;
     }
 
-
+    //This section is only reached if there was no recursive flag
     int input = open(argv[2], O_RDONLY);
     if(input < 0) errorPrint("Could not open input file", 1);
 
@@ -67,8 +60,9 @@ int main(int argc, char* argv[]){
     escapeChar[0] = _ESCAPECHAR;
     escapeChar[1] = '\0';
 
-    int inputCheck = getInput(&head, input, &escapeChar, _BUILD);
-    if(inputCheck == -1) errorPrint("FATAL ERROR: Could not fully finish tree", 1);
+    int inputCheck = 1; 
+    if(build) inputCheck = getInput(&head, input, &escapeChar, _BUILD);
+    if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //expand to different errors, but also make a different function to handle the differnt error
     if(head !=NULL) print2DTree(head, 0);
     else printf("\nHead is null\n");
     

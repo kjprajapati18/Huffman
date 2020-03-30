@@ -11,7 +11,7 @@ int recursive, build, compress, decomp;
 
 
 //checks the first 2 flags to see what we're doing and if it's recursive or not
-int flagCheck(char**);
+int flagCheck(int, char**);
 
 //prints all files in a directory and all subdirectories. just a checking method to see if recursivve directory traversal works
 void printFiles(DIR*, char*);
