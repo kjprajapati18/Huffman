@@ -2,8 +2,11 @@
 #define INPUTHANDLER_H
 #include "avl.h"
 #define _ESCAPECHAR '\\'
+#define _BUILD 10
+#define _COMPRESS 11
+#define _DECOMPRESS 12
 
-//input flags global
+//input flags global:::::::::::: NOTE: I want to get rid of at least 3 of these
 int recursive, build, compress, decomp;
 
 
@@ -17,9 +20,11 @@ void printFiles(DIR*, char*);
 void errorPrint(const char*, int);
 
 //reading function to get all input from file
-int fillAVL(Node**, int, char**);
+int getInput(Node**, int, char**, int);
 
 //handles incoming escape characters in file
 int incEscapeChar(char**, int*);
+
+int readHandler(Node**, char*, int, char**, int, int);
 
 #endif 

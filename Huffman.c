@@ -67,7 +67,7 @@ int main(int argc, char* argv[]){
     escapeChar[0] = _ESCAPECHAR;
     escapeChar[1] = '\0';
 
-    int inputCheck = fillAVL(&head, input, &escapeChar);
+    int inputCheck = getInput(&head, input, &escapeChar, _BUILD);
     if(inputCheck == -1) errorPrint("FATAL ERROR: Could not fully finish tree", 1);
     if(head !=NULL) print2DTree(head, 0);
     else printf("\nHead is null\n");

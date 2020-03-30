@@ -33,7 +33,7 @@ int flagCheck(char* argv[]){
     }
 
     return build + compress + decomp;   //return the sum so that we can check if a valid flag was picked ??????????????????????????? Maybe put the checks in here for clarity (use exit)
-
+    //NOTE::::::::::::::::::: I WANT TO GET RID OF ALL THESE FLAGS AND TRY TO USE _BUILD/COMPRESS/DECOMPRESS
 }
 
 void printFiles(DIR* directory, char* basePath){
@@ -65,7 +65,7 @@ void errorPrint(const char* message, int exitCode){
     if(exitCode != 0) exit(exitCode);
 }
 
-int fillAVL(Node** head, int fd, char** escapeChar){
+int getInput(Node** head, int fd, char** escapeChar, int mode){
 
     Node* list = *head;
     int bytesRead = 1;
@@ -93,7 +93,7 @@ int fillAVL(Node** head, int fd, char** escapeChar){
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
 	        if (isspace(buffer[i])){
                 delimiter[0] = buffer[i];
-                list = insert(list, delimiter);
+                readHandler(&list, delimiter, 1, escapeChar, escapeCharSize, mode);                            //list = insert(list, delimiter);
                 buffer[i] = '\0';
 
                 if(carryOverSize != 0){ //realloc, add tree, check/change escape char
@@ -104,16 +104,19 @@ int fillAVL(Node** head, int fd, char** escapeChar){
                     free(carryOver);
                     carryOver = temp;
 
+                    readHandler(&list, carryOver, carryOverSize, escapeChar, escapeCharSize, mode);
+                    /*
                     if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
                         incEscapeChar(escapeChar, &escapeCharSize);
                     }
-                    list = insert(list, carryOver);
+                    list = insert(list, carryOver);*/
                     carryOverSize = 0;
                 } else {
-                    if(i-startIndex == escapeCharSize+1 && strncmp(buffer+startIndex,*escapeChar,escapeCharSize)==0){
+                    readHandler(&list, buffer+startIndex, i-startIndex, escapeChar, escapeCharSize, mode);
+                    /*if(i-startIndex == escapeCharSize+1 && strncmp(buffer+startIndex,*escapeChar,escapeCharSize)==0){
                         incEscapeChar(escapeChar, &escapeCharSize);
                     }
-                    list = insert(list, buffer+startIndex);
+                    list = insert(list, buffer+startIndex);*/
                 }
 
 	            startIndex = i+1;
@@ -140,11 +143,13 @@ int fillAVL(Node** head, int fd, char** escapeChar){
     }while(bytesRead>0);
     
     if(carryOverSize !=0){
-        if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
+        readHandler(&list, carryOver, carryOverSize, escapeChar, escapeCharSize, mode);
+        /*if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
             incEscapeChar(escapeChar, &escapeCharSize);
         }
-        list = insert(list, carryOver);
+        list = insert(list, carryOver);*/
     }
+
     free(carryOver);
     *head =list;
     return 0;
@@ -164,4 +169,20 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
     free(*escapeChar);
     *escapeChar = temp;
     return 0;
+}
+
+int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int escapeCharSize, int mode){
+
+        switch(mode){
+            case _BUILD:
+                if(tokenSize == escapeCharSize+1 && strncmp(token,*escapeChar,escapeCharSize)==0){
+                    incEscapeChar(escapeChar, &escapeCharSize);
+                }
+                *head = insert(*head, token);
+            case _COMPRESS:
+            case _DECOMPRESS:
+            default:
+                break;
+        }
+
 }
