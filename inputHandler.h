@@ -1,6 +1,7 @@
 #ifndef INPUTHANDLER_H
 #define INPUTHANDLER_H
 #include "avl.h"
+#define _ESCAPECHAR '\\'
 
 //input flags global
 int recursive, build, compress, decomp;

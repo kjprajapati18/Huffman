@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <ctype.h>
 #include "inputHandler.h"
-#define _ESCAPECHAR '\\'
 
 int flagCheck(char* argv[]){
     int pos;

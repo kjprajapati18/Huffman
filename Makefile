@@ -15,7 +15,7 @@ minheap.o: minheap.c
 codebookWriter.o: codebookWriter.c
 	gcc -c codebookWriter.c
 
-inputHandler.o: inputHandler.o
+inputHandler.o: inputHandler.c
 	gcc -c inputHandler.c
 
 a.out:
