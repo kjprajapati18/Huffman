@@ -31,14 +31,14 @@
 */
 
 int main(int argc, char* argv[]){
-    tokens = 0;
+    tokens = 0, recursive = 0;
     Node* head = NULL;      //AVL head. Storing inputs for buildTree
 
     //Check for valid inputs
     if(argc < 3) errorPrint("Fatal Error: Not enough arguments", 1);
 
     //each flag corresponds to 1 or 0. flagCheck will set the proper flags. If there is an error in the input, flagCheck will display error and exit()
-    flagCheck(argc, argv);
+    int bcdFlag = flagCheck(argc, argv);
 
     //The input is proper in terms of number of arguments and position of each argument. Now try to open the needed items (directory/file/codebook)
     //We can optimize this later by using +recursive on some arguments
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]){
     escapeChar[1] = '\0';
 
     int inputCheck = 1; 
-    if(build) inputCheck = getInput(&head, input, &escapeChar, _BUILD);
+    inputCheck = getInput(&head, input, &escapeChar, bcdFlag);
     if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //expand to different errors, but also make a different function to handle the differnt error
     if(head !=NULL) print2DTree(head, 0);
     else printf("\nHead is null\n");
@@ -90,10 +90,10 @@ int main(int argc, char* argv[]){
     writeString(book, "\n");
     writeCodebook(minHeap[0], book, escapeChar, "");
 
-    if(compress + decomp){
+    /*if(compress + decomp){
         int codebook = open(argv[3], O_RDONLY);
         if(codebook < 0) errorPrint("Could not open codebook", 1);
-    }
+    }*/
 
     freeAvl(head);
     free(escapeChar);

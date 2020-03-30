@@ -2,12 +2,12 @@
 #define INPUTHANDLER_H
 #include "avl.h"
 #define _ESCAPECHAR '\\'
-#define _BUILD 10
-#define _COMPRESS 11
-#define _DECOMPRESS 12
+#define _BUILD 0x1
+#define _COMPRESS 0x2
+#define _DECOMPRESS 0x4
 
-//input flags global:::::::::::: NOTE: I want to get rid of at least 3 of these
-int recursive, build, compress, decomp;
+//recursive global flag
+int recursive;
 
 
 //checks the first 2 flags to see what we're doing and if it's recursive or not

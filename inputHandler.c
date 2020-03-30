@@ -8,21 +8,21 @@
 
 int flagCheck(int argc, char* argv[]){
     int pos;
-
+    int bcdFlag = 0;
     for(pos = 1; pos < 3; pos++){       //there can only be at most 2 flags and they must be the first 2 args
         if(*argv[pos] == '-'){          //Check if its a flag
             switch (*(argv[pos]+1)){    //Check which flag and set appropriate variable
                 case 'b':
                     printf("Using Build Huffman Codebook Flag\n");
-                    build = 1;
+                    bcdFlag |= _BUILD;
                     break;
                 case 'c':
                     printf("Using Compression Flag\n");
-                    compress = 1;
+                    bcdFlag |= _COMPRESS;
                     break;
                 case 'd':
                     printf("Using the Decompression Flag\n");
-                    decomp = 1;
+                    bcdFlag |= _DECOMPRESS;
                     break;
                 case 'R':
                     printf("Using the Recursion Flag\n");
@@ -32,19 +32,17 @@ int flagCheck(int argc, char* argv[]){
         } else break;
     }
 
-    int flags = build + compress + decomp;
     
-    //If the user did not pick build, compress, or decompress, or the user did not have flags as the first argument
-    if(flags != 1) errorPrint("Fatal Error: Invalid flag usage. Make sure to pick exactly 1 flag from the following, and that it comes before any arguments: (-b)uild, (-c)ompress, (-d)ecompress", 1);
+    //If the user did not pick build, compress, or decompress, or they picked too many. The user may have also not put flags as the first argument
+    if(bcdFlag != _BUILD && bcdFlag != _COMPRESS && bcdFlag != _DECOMPRESS) errorPrint("Fatal Error: Invalid flag usage. Make sure to pick exactly 1 flag from the following, and that it comes before any arguments: (-b)uild, (-c)ompress, (-d)ecompress", 1);
     
     //build should have 3 arguments and compress/decompress should have 4 flags (+1 if recursive flag included)
-    if((build && argc != 3+recursive) || ((compress + decomp) && argc != 4+recursive)) errorPrint("Fatal Error: Incorrect number of arguments for given flags", 1);
+    if((bcdFlag == _BUILD && argc != 3+recursive) || (bcdFlag & (_COMPRESS|_DECOMPRESS) && argc != 4+recursive)) errorPrint("Fatal Error: Incorrect number of arguments for given flags", 1);
 
     //Make sure that a proper codebook is given if we are compressing or decompressing
-    if((compress + decomp) && strcmp("HuffmanCodebook", argv[3+recursive])) errorPrint("Fatal Error: The codebook should be called 'HuffmanCodebook.'", 1);
+    if(bcdFlag & (_COMPRESS|_DECOMPRESS) && strcmp("HuffmanCodebook", argv[3+recursive])) errorPrint("Fatal Error: The codebook should be called 'HuffmanCodebook.'", 1);
 
-    return 0; //Could turn into a void function
-    //NOTE::::::::::::::::::: I WANT TO GET RID OF ALL THESE FLAGS AND TRY TO USE _BUILD/COMPRESS/DECOMPRESS
+    return bcdFlag;
 }
 
 void printFiles(DIR* directory, char* basePath){
