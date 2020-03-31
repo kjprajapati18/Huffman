@@ -74,7 +74,7 @@ void errorPrint(const char* message, int exitCode){
     if(exitCode != 0) exit(exitCode);
 }
 
-int getInput(Node** head, int fd, char** escapeChar, int mode){
+int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode){
 
     Node* list = *head;
     int bytesRead = 1;
@@ -92,7 +92,7 @@ int getInput(Node** head, int fd, char** escapeChar, int mode){
     *carryOver = '\0';
   
     do{
-        bytesRead = read(fd, buffer, 200);
+        bytesRead = read(inputFd, buffer, 200);
         if(bytesRead == -1) return -1;
         else if (bytesRead == 0) break;
         buffer[bytesRead] = '\0';
@@ -102,7 +102,7 @@ int getInput(Node** head, int fd, char** escapeChar, int mode){
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
 	        if (isspace(buffer[i])){
                 delimiter[0] = buffer[i];
-                readHandler(&list, delimiter, 1, escapeChar, escapeCharSize, mode);                            //list = insert(list, delimiter);
+                readHandler(&list, delimiter, 1, escapeChar, escapeCharSize, outputFd, mode);                            //list = insert(list, delimiter);
                 buffer[i] = '\0';
 
                 if(carryOverSize != 0){ //realloc, add tree, check/change escape char
@@ -113,7 +113,7 @@ int getInput(Node** head, int fd, char** escapeChar, int mode){
                     free(carryOver);
                     carryOver = temp;
 
-                    readHandler(&list, carryOver, carryOverSize, escapeChar, escapeCharSize, mode);
+                    readHandler(&list, carryOver, carryOverSize, escapeChar, escapeCharSize, outputFd, mode);
                     /*
                     if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
                         incEscapeChar(escapeChar, &escapeCharSize);
@@ -121,7 +121,7 @@ int getInput(Node** head, int fd, char** escapeChar, int mode){
                     list = insert(list, carryOver);*/
                     carryOverSize = 0;
                 } else {
-                    readHandler(&list, buffer+startIndex, i-startIndex, escapeChar, escapeCharSize, mode);
+                    readHandler(&list, buffer+startIndex, i-startIndex, escapeChar, escapeCharSize, outputFd, mode);
                     /*if(i-startIndex == escapeCharSize+1 && strncmp(buffer+startIndex,*escapeChar,escapeCharSize)==0){
                         incEscapeChar(escapeChar, &escapeCharSize);
                     }
@@ -152,7 +152,7 @@ int getInput(Node** head, int fd, char** escapeChar, int mode){
     }while(bytesRead>0);
     
     if(carryOverSize !=0){
-        readHandler(&list, carryOver, carryOverSize, escapeChar, escapeCharSize, mode);
+        readHandler(&list, carryOver, carryOverSize, escapeChar, escapeCharSize, outputFd, mode);
         /*if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
             incEscapeChar(escapeChar, &escapeCharSize);
         }
@@ -180,7 +180,7 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
     return 0;
 }
 
-int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int escapeCharSize, int mode){
+int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int escapeCharSize, int outputFd, int mode){
 
         switch(mode){
             case _BUILD:

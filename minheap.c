@@ -77,7 +77,8 @@ treeNode* pop(treeNode* minHeap[]){
 treeNode* merge(treeNode* less, treeNode* great){
     treeNode* newNode = (treeNode*) malloc(sizeof(treeNode));
     newNode->freq = less->freq + great->freq;
-    newNode->token = "\0";
+    newNode->token = (char*) malloc(sizeof(char));
+    *(newNode->token) = '\0';
     newNode->left = less;
     newNode->right = great;
     return newNode;
@@ -86,6 +87,7 @@ treeNode* merge(treeNode* less, treeNode* great){
 void freeHuff(treeNode* head){
     treeNode* l = head->left;
     treeNode* r = head->right;
+    free(head->token);
     free(head);
     if(l != NULL) freeHuff(l);
     if(r != NULL) freeHuff(r);

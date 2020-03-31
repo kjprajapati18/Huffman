@@ -16,8 +16,9 @@
 #include "minheap.h"
 #include "codebookWriter.h"
 #include "inputHandler.h"
-void performOperation (int mode, int input);
+void performOperation (int mode, int input, int inputCodebook);
 void buildHuffmanCodebook(int input);
+void compressFile(int input, int inputCodebook);
 #define _ESCAPECHAR '\\'
 /* TO DO LIST:::::::::::
 
@@ -55,7 +56,15 @@ int main(int argc, char* argv[]){
     }
 
     int input = open(argv[2], O_RDONLY);
-    performOperation(bcdFlag, input);
+    if(input < 0) errorPrint("Could not open input file", 1);
+
+    if(bcdFlag == _BUILD) performOperation(bcdFlag, input, -1);
+    else{
+        int inputCodebook = open(argv[3], O_RDONLY);
+        if(inputCodebook < 0) errorPrint("Could not open input Codebook", 1);
+        performOperation(bcdFlag, input, inputCodebook);
+        close(inputCodebook);
+    }
     close(input);
 
     return 0;
@@ -114,16 +123,14 @@ int main(int argc, char* argv[]){
 }
 
 
-void performOperation (int mode, int input){
+void performOperation (int mode, int input, int inputCodebook){
 
-    if(input < 0) errorPrint("Could not open input file", 1);
-    
     switch (mode){
     case _BUILD:
         buildHuffmanCodebook(input);
         break;
     case _COMPRESS:
-
+        compressFile(input, inputCodebook);
         break;
     case _DECOMPRESS:
 
@@ -141,7 +148,7 @@ void buildHuffmanCodebook(int input){
     escapeChar[1] = '\0';
 
     int inputCheck; 
-    inputCheck = getInput(&head, input, &escapeChar, _BUILD);
+    inputCheck = getInput(&head, input, &escapeChar, -1, _BUILD);
     if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //expand to different errors, but also make a different function to handle the differnt error
     
     /*if(head !=NULL) print2DTree(head, 0);
@@ -183,6 +190,11 @@ void buildHuffmanCodebook(int input){
     close(book);
 }
 
+void compressFile(int input, int inputCodebook){
+
+
+
+}
 
 //checks the first 2 flags to see what we're doing and if it's recursive or not
 /*int flagCheck(char* argv[]){

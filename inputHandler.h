@@ -20,11 +20,11 @@ void printFiles(DIR*, char*);
 void errorPrint(const char*, int);
 
 //reading function to get all input from file
-int getInput(Node**, int, char**, int);
+int getInput(Node**, int, char**, int, int);
 
 //handles incoming escape characters in file
 int incEscapeChar(char**, int*);
 
-int readHandler(Node**, char*, int, char**, int, int);
+int readHandler(Node**, char*, int, char**, int, int, int);
 
 #endif 
