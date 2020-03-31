@@ -188,8 +188,13 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
                     incEscapeChar(escapeChar, &escapeCharSize);
                 }
                 *head = insert(*head, token);
+                break;
             case _COMPRESS:
+
+                break;
             case _DECOMPRESS:
+
+                break;
             default:
                 break;
         }

@@ -16,6 +16,8 @@
 #include "minheap.h"
 #include "codebookWriter.h"
 #include "inputHandler.h"
+void performOperation (int mode, int input);
+void buildHuffmanCodebook(int input);
 #define _ESCAPECHAR '\\'
 /* TO DO LIST:::::::::::
 
@@ -52,6 +54,12 @@ int main(int argc, char* argv[]){
         return 0;
     }
 
+    int input = open(argv[2], O_RDONLY);
+    performOperation(bcdFlag, input);
+    close(input);
+
+    return 0;
+/*
     //This section is only reached if there was no recursive flag
     int input = open(argv[2], O_RDONLY);
     if(input < 0) errorPrint("Could not open input file", 1);
@@ -60,10 +68,11 @@ int main(int argc, char* argv[]){
     escapeChar[0] = _ESCAPECHAR;
     escapeChar[1] = '\0';
 
-    int inputCheck = 1; 
+    int inputCheck; 
     inputCheck = getInput(&head, input, &escapeChar, bcdFlag);
     if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //expand to different errors, but also make a different function to handle the differnt error
-    if(head !=NULL) print2DTree(head, 0);
+    
+    /*if(head !=NULL) print2DTree(head, 0);
     else printf("\nHead is null\n");
     
     //Put build huffman here
@@ -74,7 +83,7 @@ int main(int argc, char* argv[]){
     int i;
     for(i = tokens -1; i >= 0; i --){
         heapify(minHeap, i);
-    }
+    }                                                                                   ///////////// LETS MOVE ALL OF THIS TO A FUNCTION IN any other file
     while(HeapSize >1){
         treeNode* less = pop(minHeap);
         treeNode* great = pop(minHeap);
@@ -84,6 +93,79 @@ int main(int argc, char* argv[]){
     printf("%d", HeapSize);
     print2DTreeNode(minHeap[0], 0);
     //////////////////////////
+    
+    remove("./HuffmanCodebook");
+    int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00600);
+    writeString(book, escapeChar);
+    writeString(book, "\n");
+    writeCodebook(minHeap[0], book, escapeChar, "");
+
+    /*if(compress + decomp){
+        int codebook = open(argv[3], O_RDONLY);
+        if(codebook < 0) errorPrint("Could not open codebook", 1);
+    }
+
+    freeAvl(head);
+    free(escapeChar);
+    freeHuff(minHeap[0]);
+    close(input);
+    close(book);
+    return 0;*/
+}
+
+
+void performOperation (int mode, int input){
+
+    if(input < 0) errorPrint("Could not open input file", 1);
+    
+    switch (mode){
+    case _BUILD:
+        buildHuffmanCodebook(input);
+        break;
+    case _COMPRESS:
+
+        break;
+    case _DECOMPRESS:
+
+        break;
+    default:
+        break;
+    }
+}
+
+void buildHuffmanCodebook(int input){
+    Node* head= NULL;
+
+    char* escapeChar = (char*) malloc(sizeof(char)*2);
+    escapeChar[0] = _ESCAPECHAR;
+    escapeChar[1] = '\0';
+
+    int inputCheck; 
+    inputCheck = getInput(&head, input, &escapeChar, _BUILD);
+    if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //expand to different errors, but also make a different function to handle the differnt error
+    
+    /*if(head !=NULL) print2DTree(head, 0);
+    else printf("\nHead is null\n");*/
+    
+    //Put build huffman here
+    HeapSize = tokens;
+    treeNode* minHeap[HeapSize];
+    fillMinHeapArray(minHeap, head, 0);
+    
+    int i;
+    for(i = tokens -1; i >= 0; i --){
+        heapify(minHeap, i);
+    }                                                                                   ///////////// LETS MOVE ALL OF THIS TO A FUNCTION IN any other file
+    while(HeapSize >1){
+        treeNode* less = pop(minHeap);
+        treeNode* great = pop(minHeap);
+        treeNode* newNode = merge(less, great);
+        insertHeap(minHeap, newNode);
+    }
+    printf("%d", HeapSize);
+    print2DTreeNode(minHeap[0], 0);
+    //////////////////////////
+    
     remove("./HuffmanCodebook");
     int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00600);
     writeString(book, escapeChar);
@@ -98,10 +180,9 @@ int main(int argc, char* argv[]){
     freeAvl(head);
     free(escapeChar);
     freeHuff(minHeap[0]);
-    close(input);
     close(book);
-    return 0;
 }
+
 
 //checks the first 2 flags to see what we're doing and if it's recursive or not
 /*int flagCheck(char* argv[]){
