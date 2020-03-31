@@ -161,3 +161,20 @@ void print2DTree(Node *root, int space)
     // Process left child 
     print2DTree(root->left, space); 
 }
+
+
+int findAVLNode(Node** selectedNode, Node* head, char* token){
+    if(token[0] == '\0') return -1;
+    if(head == NULL){
+        return -2;
+    }
+
+    if(strcmp(token, head->string) < 0)
+        findAVLNode(selectedNode, head->left, token);
+    else if(strcmp(token, head->string) > 0)
+        findAVLNode(selectedNode, head->right, token);
+    else{
+        *selectedNode = head;
+        return 0;
+    }
+}

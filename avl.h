@@ -21,6 +21,8 @@ void freeAvl(Node*);
 void printPreOrder(Node*);
 void print2DTree(Node* root, int space);
 
+int findAVLNode(Node**, Node*, char*);
+
 
 int tokens;
 

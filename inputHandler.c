@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include "inputHandler.h"
+#include "codebookWriter.h"
 
 int flagCheck(int argc, char* argv[]){
     int pos;
@@ -190,7 +191,12 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
                 *head = insert(*head, token);
                 break;
             case _COMPRESS:
-
+                Node* selectedNode= NULL;
+                int found = findAVLNode(&selectedNode, *head, token);
+                if(found != 0) errorPrint("FATAL ERROR: No code exists for this word", 1);
+                char toWrite[20];
+                sprintf(toWrite, "%d", selectedNode->val);
+                writeString(outputFd, toWrite);
                 break;
             case _DECOMPRESS:
 
