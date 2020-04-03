@@ -211,7 +211,8 @@ Node* codebookAvl(int bookfd){
     int bytesRead = 0;
     char[201] buffer;
     char[201] carry;
-    char* escapeChar;
+    char* escapeChar = (char*) malloc(sizeof(char));
+    *escapeChar = '\0';
     char* escapeTemp;
     int carryOverbool = 0;
     int carryOverSize = 0;
@@ -225,16 +226,18 @@ Node* codebookAvl(int bookfd){
             index++;
         }
         if(buffer[index] == '\n'){
-            escapeTemp = (char*)malloc(sizeof(char)* carryOverSize+ index);
+            escapeTemp = (char*) malloc(carryOverSize+ index);
             carry[index] = '\0';
             strcpy(escapeTemp, escapeChar);
             strcat(escapeTemp, carry);
+            free(escapeChar);
+            escapeChar = escapeTemp;
             lseek(bookfd, SEEK_CUR, index+1-bytesRead +1);
             break;
         }
 
         if(carryOverbool){
-            escapeTemp = (char*) malloc(sizeof(char)*index + carryOverSize +1);
+            escapeTemp = (char*) malloc(index + carryOverSize +1);
             carry[index] = '\0';
             strcpy(escapeTemp, escapeChar);
             strcat(escapeTemp, carry);
@@ -244,7 +247,7 @@ Node* codebookAvl(int bookfd){
         }
         else{
             carryOverbool = 1;
-            escapeChar = (char*) malloc(sizeof(char)*bytesRead+1);
+            escapeChar = (char*) malloc(bytesRead+1);
             carry[index] = '\0';
             strcpy(escapeChar, carry);
             carryOverSize += bytesRead;

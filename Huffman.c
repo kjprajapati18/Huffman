@@ -30,6 +30,9 @@ void buildHuffmanCodebook(int input);
     -Create insert with siftUp
     -Pop with siftDown
 
+    QUESTIONS?
+    -compress/decompress with blank codebook what do?
+    -
 */
 
 int main(int argc, char* argv[]){
