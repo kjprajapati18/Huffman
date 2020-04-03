@@ -37,10 +37,12 @@ int height(Node* head){
 }
 
 //mallocs new node and sets word and frequency values
-Node* makeNode(char* word){
+Node* makeNode(char* word, char* code){
     Node* newNode = (Node*) malloc(sizeof(Node));
     newNode->string = (char*) malloc(sizeof(char) * (strlen(word)+1));
     strcpy(newNode->string, word);
+    newNode->codeString = (char*) malloc(sizeof(char)* (strlen(code)+1));
+    strcpy(newNode->codeString, code);
     newNode->val = 1;
     newNode->left = NULL;
     newNode->right = NULL;
@@ -80,11 +82,11 @@ int balanceFactor(Node* head){
     return (head == NULL)? 0: height(head->left) - height(head->right);
 }
 
-Node* insert(Node* node, char* word){
+Node* insert(Node* node, char* word, char* code){
     if(word[0] == '\0') return node;
     if(node == NULL){
         tokens++;
-        return makeNode(word);
+        return makeNode(word, code);
     } 
 
     if(strcmp(word, node->string) < 0)

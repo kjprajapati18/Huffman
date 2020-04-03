@@ -4,6 +4,7 @@
 //tree nodes hold a string and an int- word and freq
 typedef struct  node{
     char* string;
+    char* codeString;
     int val;
     struct node* left;
     struct node* right;
@@ -16,7 +17,7 @@ Node* makeNode(char*);
 Node* RR(Node*);
 Node* LR(Node*);
 int balanceFactor(Node*);
-Node* insert(Node*, char*);
+Node* insert(Node*, char*, char*);
 void freeAvl(Node*);
 void printPreOrder(Node*);
 void print2DTree(Node* root, int space);

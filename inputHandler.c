@@ -188,7 +188,7 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
                 if(tokenSize == escapeCharSize+1 && strncmp(token,*escapeChar,escapeCharSize)==0){
                     incEscapeChar(escapeChar, &escapeCharSize);
                 }
-                *head = insert(*head, token);
+                *head = insert(*head, token, "\0");
                 break;
             case _COMPRESS:
                 Node* selectedNode= NULL;
@@ -205,4 +205,145 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
                 break;
         }
 
+}
+
+Node* codebookAvl(int bookfd){
+    int bytesRead = 0;
+    char[201] buffer;
+    char[201] carry;
+    char* escapeChar;
+    char* escapeTemp;
+    int carryOverbool = 0;
+    int carryOverSize = 0;
+    do{
+        bytesRead = read(bookfd, buffer, 200);
+        if(bytesRead == -1) return NULL;
+        int index = 0;
+        buffer[bytesRead] = '\0';
+        while(buffer[index] != '\n' && buffer[index] != '\0'){
+            carry[index] = buffer[index];
+            index++;
+        }
+        if(buffer[index] == '\n'){
+            escapeTemp = (char*)malloc(sizeof(char)* carryOverSize+ index);
+            carry[index] = '\0';
+            strcpy(escapeTemp, escapeChar);
+            strcat(escapeTemp, carry);
+            lseek(bookfd, SEEK_CUR, index+1-bytesRead +1);
+            break;
+        }
+
+        if(carryOverbool){
+            escapeTemp = (char*) malloc(sizeof(char)*index + carryOverSize +1);
+            carry[index] = '\0';
+            strcpy(escapeTemp, escapeChar);
+            strcat(escapeTemp, carry);
+            free(escapeChar);
+            escapeChar = escapeTemp;
+            carryOverSize+= bytesRead;
+        }
+        else{
+            carryOverbool = 1;
+            escapeChar = (char*) malloc(sizeof(char)*bytesRead+1);
+            carry[index] = '\0';
+            strcpy(escapeChar, carry);
+            carryOverSize += bytesRead;
+        }
+        
+        
+    }while(bytesRead >0);
+    bytesRead = 0;
+    char* word = (char*) malloc(sizeof(char));
+    char* wordTemp;
+    *word= '\0';
+    char* code = (char*) malloc(sizeof(char));
+    *code = '\0';
+    char* codeTemp;
+    int codeBool = 1;
+    int wordBool = 0;
+    int wordCarryOverbool = 0;
+    int wordCarryOverSize = 0;
+    int codeCarryOverbool = 0;
+    int codeCarryOverSize = 0;
+    Node* head = NULL;
+    do{
+        bytesRead = read(bookfd, buffer, 200);
+        if (bytesRead) == -1 return NULL;
+        int index = 0;
+        buffer[bytesRead] = '\0';
+        while (buffer[index] != '\n' && buffer[index] != '\t' && buffer[index] != '\0'){
+            carry[index] = buffer[index];
+            index++;
+        }
+        if(buffer[index] == '\t'){
+            codeTemp = (char*) malloc(sizeof(char)*index + codeCarryOverSize);
+            carry[index] = '\0';
+            strcpy(codeTemp, code);
+            strcat(codeTemp, carry);
+            free(code);
+            code = codeTemp;
+            codeBool = 0; codeCarryOverbool = 0; codeCarryOverSize = 0;
+            wordBool = 1; 
+            lseek(bookfd, SEEK_CUR, index + 1 - bytesRead +1);
+            continue;
+        }
+        if(buffer[index] == '\n'){
+            wordTemp = (char*) malloc(sizeof(char)*index + wordCarryOverSize);
+            carry[index] = '\0';
+            strcpy(wordTemp, word);
+            strcat(wordTemp, carry);
+            free(word);
+            word = wordTemp;
+            wordBool = 0; wordCarryOverbool = 0; wordCarryOverSize = 0;
+            codeBool = 1;
+            lseek(bookfd, SEEK_CUR, index +1 - bytesRead +1);
+            int len = strlen(escapeChar);
+            if(strncmp(word, escapeChar, len) == 0){
+                if(word[len] == 'n'){
+                    free(word);
+                    word = "\n";
+                }
+                else if(word[len] == 't'){
+                    free(word);
+                    word = "\t";
+                }
+            }
+            head = insert(head, word, code);
+            continue;
+        }
+        if(wordCarryOverbool){
+            wordTemp = (char*) malloc(sizeof(char)*index + wordCarryOverSize+1);
+            carry[index] = '\0';
+            strcpy(wordTemp, word);
+            strcat(wordTemp, carry);
+            free(word);
+            word = wordTemp;
+            wordCarryOverSize += bytesRead; 
+        }
+        else if(wordBool){
+            wordCarryOverbool = 1;
+            free(word);
+            word = (char*) malloc(sizeof(char)*bytesRead+1);
+            carry[index] = '\0';
+            strcpy(word, carry);
+            wordCarryOverSize+= bytesRead;
+        }
+        if(codeCarryOverbool){
+            codeTemp = (char*) malloc(sizeof(char)* index + codeCarrySize+1);
+            carry[index] = '\0';
+            strcpy(codeTemp, code);
+            strcat(codeTemp, carry);
+            free(code);
+            code = codeTemp;
+            codeCarryOverSize += bytesRead;
+        }
+        else if(codeBool){
+            codeCarryOverbool = 1;
+            free(code);
+            code = (char*) malloc(sizeof(char)*bytesRead+1);
+            carry[index] = '\0';
+            strcpy(code, carry);
+            codeCarryOverSize+=bytesRead;
+        }
+    }while(bytesRead > 0;)
 }
