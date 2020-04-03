@@ -268,7 +268,7 @@ Node* codebookAvl(int bookfd){
     Node* head = NULL;
     do{
         bytesRead = read(bookfd, buffer, 200);
-        if (bytesRead) == -1 return NULL;
+        if (bytesRead == -1) return NULL;
         int index = 0;
         buffer[bytesRead] = '\0';
         while (buffer[index] != '\n' && buffer[index] != '\t' && buffer[index] != '\0'){
@@ -329,7 +329,7 @@ Node* codebookAvl(int bookfd){
             wordCarryOverSize+= bytesRead;
         }
         if(codeCarryOverbool){
-            codeTemp = (char*) malloc(sizeof(char)* index + codeCarrySize+1);
+            codeTemp = (char*) malloc(sizeof(char)* index + codeCarryOverSize+1);
             carry[index] = '\0';
             strcpy(codeTemp, code);
             strcat(codeTemp, carry);
@@ -345,5 +345,6 @@ Node* codebookAvl(int bookfd){
             strcpy(code, carry);
             codeCarryOverSize+=bytesRead;
         }
-    }while(bytesRead > 0;)
+    }while(bytesRead > 0);
+    return head;
 }
