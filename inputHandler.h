@@ -28,6 +28,6 @@ int incEscapeChar(char**, int*);
 int readHandler(Node**, char*, int, char**, int, int, int);
 
 //makes avl from huffman codebook
-Node* codebookAvl(int bookfd);
+Node* codebookAvl(int, Node* (Node*, char*, char*));
 
 #endif 

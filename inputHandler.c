@@ -210,8 +210,8 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
 }
 Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
     int bytesRead = 0;
-    char[201] buffer;
-    char[201] carry;
+    char buffer[201];
+    char carry[201];
     char* escapeChar = (char*) malloc(sizeof(char));
     *escapeChar = '\0';
     char* escapeTemp;
