@@ -280,7 +280,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                 codeTemp = (char*) malloc(codeCarryOverSize + (index - startIndex));
                 buffer[index] = '\0';
                 strcpy(codeTemp, code);
-                strcat(codeTemp, buffer[startIndex]);
+                strcat(codeTemp, buffer+startIndex);
                 free(code);
                 code = codeTemp;
                 codeBool = 0; codeCarryOverSize = 0;
@@ -290,7 +290,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                 wordTemp = (char*) malloc(index -startIndex + wordCarryOverSize);
                 buffer[index] = '\0';
                 strcpy(wordTemp, word);
-                strcat(wordTemp, buffer[startIndex]);
+                strcat(wordTemp, buffer+startIndex);
                 free(word);
                 word = wordTemp;
                 wordCarryOverSize = 0; codeBool = 1;
@@ -315,7 +315,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                 if(codeBool){
                     codeTemp = (char*) malloc(index - startIndex + codeCarryOverSize);
                     strcpy(codeTemp, code);
-                    strcat(codeTemp, buffer[startIndex]);
+                    strcat(codeTemp, buffer+startIndex);
                     free(code);
                     code = codeTemp;
                     codeCarryOverSize += index-startIndex;
@@ -323,7 +323,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                 else{
                     wordTemp = (char*) malloc(index - startIndex + wordCarryOverSize);
                     strcpy(wordTemp, word);
-                    strcat(wordTemp, buffer[startIndex]);
+                    strcat(wordTemp, buffer+startIndex);
                     free(word);
                     word = wordTemp;
                     wordCarryOverSize += index - startIndex;

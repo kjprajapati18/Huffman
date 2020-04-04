@@ -140,21 +140,27 @@ void performOperation (int mode, int codeBook, char* inputPath){
             strcpy(outputName, inputPath);
             strcat(outputName, ".hcz");
 
-            headAVL = codebookAvl(codeBook, insert);        //ADD FUNCTION POINTER WHEN IMPLEMENTED
-            int output = open(outputName, O_WRONLY | O_CREAT, 00600);
-            getInput(&headAVL, input, NULL, output, mode);
+            headAVL = codebookAvl(codeBook, insert);       //ADD FUNCTION POINTER WHEN IMPLEMENTED
+            int outputComp = open(outputName, O_WRONLY | O_CREAT, 00600);
+            getInput(&headAVL, input, NULL, outputComp, mode);
 
-            close(output);
+            close(outputComp);
             break;
         case _DECOMPRESS:
-            headAVL = codebookAvl(codeBook, insertHeap);        //ADD FUNCTION POINTER WHEN IMPOLEMENTED
+            headAVL = codebookAvl(codeBook, rebuildHuffman);        //ADD FUNCTION POINTER WHEN IMPOLEMENTED
 
             // String manipulation to figure out output filename here
+            outputName = (char*) malloc(sizeof(char)*(inputPathLength+5));
+            outputName[0] = '\0';
+            strcpy(outputName, inputPath);
+            strcat(outputName, ".txt");         //THIS NEEDS TO BE CHANGED BEFORE WE SUBMIT
 
             // Here is going to be writing the decompress function (new function)
+            int outputDecomp = open(outputName, O_WRONLY | O_CREAT, 00600);
+
 
             // close and free
-
+            close(outputDecomp);
             break;
         default:
             break;
@@ -194,11 +200,10 @@ void buildHuffmanCodebook(int input){
         insertHeap(minHeap, newNode);
     }
     printf("%d", HeapSize);
-    print2DTreeNode(minHeap[0], 0);
     //////////////////////////
     
     remove("./HuffmanCodebook");
-    int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00600);
+    int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00400);
     writeString(book, escapeChar);
     writeString(book, "\n");
     writeCodebook(minHeap[0], book, escapeChar, "");

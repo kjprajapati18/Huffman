@@ -1,6 +1,7 @@
 #ifndef INPUTHANDLER_H
 #define INPUTHANDLER_H
 #include "avl.h"
+#include <dirent.h>
 #define _ESCAPECHAR '\\'
 #define _BUILD 0x1
 #define _COMPRESS 0x2
