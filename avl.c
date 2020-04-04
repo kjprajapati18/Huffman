@@ -132,6 +132,7 @@ void freeAvl(Node* head){
     Node* l = head->left;
     Node* r = head->right;
     free(head->string);
+    free(head->codeString);
     free(head);
     if(l != NULL) freeAvl(l);
     if(r != NULL) freeAvl(r);
