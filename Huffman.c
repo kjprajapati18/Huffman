@@ -126,7 +126,8 @@ void performOperation (int mode, int codeBook, char* inputPath){
     if(mode != _BUILD && codeBook < 0) errorPrint("Could not open codebook file", 1);
 
     int inputPathLength = strlen(inputPath);
-    char* outputName, escapeChar;
+    char* outputName;
+    Node* headAVL;
 
     switch (mode){
         case _BUILD:
@@ -139,13 +140,20 @@ void performOperation (int mode, int codeBook, char* inputPath){
             strcpy(outputName, inputPath);
             strcat(outputName, ".hcz");
 
-            Node* headAVL = codebookAvl(codeBook); //PASS ESCAPE CHAR HERE
+            headAVL = codebookAvl(codeBook);        //ADD FUNCTION POINTER WHEN IMPLEMENTED
             int output = open(outputName, O_WRONLY | O_CREAT, 00600);
             getInput(&headAVL, input, NULL, output, mode);
 
             close(output);
             break;
         case _DECOMPRESS:
+            headAVL = codebookAvl(codeBook);        //ADD FUNCTION POINTER WHEN IMPOLEMENTED
+
+            // String manipulation to figure out output filename here
+
+            // Here is going to be writing the decompress function (new function)
+
+            // close and free
 
             break;
         default:

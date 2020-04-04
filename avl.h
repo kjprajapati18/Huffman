@@ -23,6 +23,7 @@ void printPreOrder(Node*);
 void print2DTree(Node* root, int space);
 
 int findAVLNode(Node**, Node*, char*);
+Node* rebuildHuffman(Node* head, char* token, char* bitString);
 
 
 int tokens;

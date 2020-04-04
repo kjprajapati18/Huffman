@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "avl.h"
+#include "inputHandler.h"
 #define COUNT 10
 
 /*int main(int argc, char* argv[]){
@@ -180,4 +181,21 @@ int findAVLNode(Node** selectedNode, Node* head, char* token){
         *selectedNode = head;
         return 0;
     }
+}
+
+Node* rebuildHuffman(Node* head, char* token, char* bitString){
+    if(head == NULL){
+        head = makeNode(token, bitString);
+    }
+
+    if(*bitString = '0'){
+        head->left = rebuildHuffman(head->left, token, bitString+1);
+    }else if(*bitString = '1'){
+        head->right = rebuildHuffman(head->right, token, bitString+1);
+    }else if (*bitString != '\0'){
+        printf("Fatal Error: Huffman code for [%s] is [%s], which is not a bit string\n", token, bitString);
+        exit(1);
+    }
+
+    return head;
 }
