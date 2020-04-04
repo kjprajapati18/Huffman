@@ -208,7 +208,10 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
                 break;
             case _COMPRESS:
                 found = findAVLNode(&selectedNode, *head, token);
-                if(found != 0) errorPrint("FATAL ERROR: No code exists for this word", 1);
+                if(found != 0){
+                    printf("Fatal Error: No huffman code exists for a token: %s\n", token);
+                    exit(1);
+                }
                 writeString(outputFd, selectedNode->codeString);
                 break;
             case _DECOMPRESS:
