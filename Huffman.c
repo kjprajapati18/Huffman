@@ -140,14 +140,14 @@ void performOperation (int mode, int codeBook, char* inputPath){
             strcpy(outputName, inputPath);
             strcat(outputName, ".hcz");
 
-            headAVL = codebookAvl(codeBook);        //ADD FUNCTION POINTER WHEN IMPLEMENTED
+            headAVL = codebookAvl(codeBook, insert);        //ADD FUNCTION POINTER WHEN IMPLEMENTED
             int output = open(outputName, O_WRONLY | O_CREAT, 00600);
             getInput(&headAVL, input, NULL, output, mode);
 
             close(output);
             break;
         case _DECOMPRESS:
-            headAVL = codebookAvl(codeBook);        //ADD FUNCTION POINTER WHEN IMPOLEMENTED
+            headAVL = codebookAvl(codeBook, insertHeap);        //ADD FUNCTION POINTER WHEN IMPOLEMENTED
 
             // String manipulation to figure out output filename here
 
