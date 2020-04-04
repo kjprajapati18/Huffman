@@ -5,6 +5,7 @@ buildTest: Huffman.c avl.o minheap.o codebookWriter.o inputHandler.o test.txt
 	make clean
 	make all
 	./a.out -b test.txt
+	diff HuffmanCodebook HuffmanCodebook2 | wc
 
 avl.o: avl.c
 	gcc -c avl.c

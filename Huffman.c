@@ -135,12 +135,13 @@ void performOperation (int mode, int codeBook, char* inputPath){
             buildHuffmanCodebook(input);
             break;
         case _COMPRESS:
-            outputName = (char*) malloc(sizeof(char)*(inputPathLength+5));
+            outputName = (char*) malloc(sizeof(char)*(inputPathLength+5+4));
             outputName[0] = '\0';
             strcpy(outputName, inputPath);
-            strcat(outputName, ".hcz");
+            strcat(outputName, "test.hcz");
 
             headAVL = codebookAvl(codeBook, insert);       //ADD FUNCTION POINTER WHEN IMPLEMENTED
+            print2DTree(headAVL, 0);
             int outputComp = open(outputName, O_WRONLY | O_CREAT, 00600);
             getInput(&headAVL, input, NULL, outputComp, mode);
 

@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <errno.h>
 #include "inputHandler.h"
 #include "codebookWriter.h"
 
@@ -193,7 +194,9 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
                 *head = insert(*head, token, "\0");
                 break;
             case _COMPRESS:
+                if(*token == '\0') return 0;
                 found = findAVLNode(&selectedNode, *head, token);
+                printf("%d\n", found);
                 if(found != 0){
                     printf("Fatal Error: No huffman code exists for a token: %s\n", token);
                     exit(1);
@@ -206,7 +209,7 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
             default:
                 break;
         }
-
+    return 0;//change to vodi prolly
 }
 Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
     int bytesRead = 0;
@@ -233,7 +236,10 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
             strcat(escapeTemp, carry);
             free(escapeChar);
             escapeChar = escapeTemp;
-            lseek(bookfd, SEEK_CUR, index+1-bytesRead +1);
+            lseek(bookfd, index+1, SEEK_SET);
+            // read(bookfd, buffer, 1);
+            // buffer[1] = '\0';
+            // printf("%s\n", buffer);
             break;
         }
 
@@ -264,20 +270,25 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
     int codeBool = 1;
     int wordCarryOverSize = 0;
     int codeCarryOverSize = 0;
-    int startIndex = 0;
+    int len = strlen(escapeChar);
     Node* head = NULL;
+    /////////////////////////////////////////////////////////////////////////printf("%s\n", escapeChar);
     do{
         bytesRead = read(bookfd, buffer, 200);
+        //printf("%s\n", buffer);
         if (bytesRead == -1) return NULL;
         int index = 0;
+        int startIndex = 0;
         buffer[bytesRead] = '\0';
         char* word = (char*) malloc(sizeof(char));
         *word= '\0';
         char* code = (char*) malloc(sizeof(char));
         *code = '\0';
         while (index <= bytesRead){
+            //printf("%d\n", index);
             if(buffer[index] == '\t'){
-                codeTemp = (char*) malloc(codeCarryOverSize + (index - startIndex));
+                codeTemp = (char*) malloc(codeCarryOverSize + (index - startIndex)+1);
+                *codeTemp = '\0';
                 buffer[index] = '\0';
                 strcpy(codeTemp, code);
                 strcat(codeTemp, buffer+startIndex);
@@ -287,29 +298,37 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                 startIndex = index +1;
             }
             else if(buffer[index] == '\n'){
-                wordTemp = (char*) malloc(index -startIndex + wordCarryOverSize);
+                wordTemp = (char*) malloc(index -startIndex + wordCarryOverSize+1);
                 buffer[index] = '\0';
+                *wordTemp = '\0';
                 strcpy(wordTemp, word);
                 strcat(wordTemp, buffer+startIndex);
                 free(word);
                 word = wordTemp;
                 wordCarryOverSize = 0; codeBool = 1;
-                int len = strlen(escapeChar);
+                //printf("%d\n", strncmp(word, escapeChar, len));
                 if(strncmp(word, escapeChar, len) == 0){
-                    if(word[len] == 'n'){
-                        free(word);
+                    char controlCode = word[len];
+                    free(word);
+                    word = malloc(sizeof(char)*(2));
+                    if(controlCode == 'n'){
                         *word = '\n';
                     }
-                    else if(word[len] == 't'){
-                        free(word);
+                    else if(controlCode == 't'){
                         *word = '\t';
                     }
-                    else if(word[len] == 'r'){
-                        free(word);
+                    else if(controlCode == 'r'){
                         *word = '\r';
                     }
+                    word[1] = '\0';
                 }
+                printf("Adding %s<-%s", code, word);
                 head = treeInsert(head, word, code);
+                printf("\t\tAdded!\n");
+                printf("%s is the head\n", head->string);
+                *word = '\0';
+                *code = '\0';
+                startIndex = index +1;
             }
             else if(buffer[index] == '\0'){
                 if(codeBool){
@@ -329,6 +348,8 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                     wordCarryOverSize += index - startIndex;
                 }
             }
+            
+            //printf("%s_->_%s\n", word, code);
             index++;
         }
     }while(bytesRead > 0);

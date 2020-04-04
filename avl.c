@@ -168,19 +168,20 @@ void print2DTree(Node *root, int space)
 
 
 int findAVLNode(Node** selectedNode, Node* head, char* token){
+    int status = 0;
     if(token[0] == '\0') return -1;
     if(head == NULL){
         return -2;
     }
 
     if(strcmp(token, head->string) < 0)
-        findAVLNode(selectedNode, head->left, token);
+        status = findAVLNode(selectedNode, head->left, token);
     else if(strcmp(token, head->string) > 0)
-        findAVLNode(selectedNode, head->right, token);
+        status = findAVLNode(selectedNode, head->right, token);
     else{
         *selectedNode = head;
-        return 0;
     }
+    return status;
 }
 
 Node* rebuildHuffman(Node* head, char* token, char* bitString){
