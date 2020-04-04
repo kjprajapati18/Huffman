@@ -181,8 +181,10 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
     return 0;
 }
 
-int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int escapeCharSize, int outputFd, int mode){
 
+int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int escapeCharSize, int outputFd, int mode){
+    Node* selectedNode;
+    int found;
         switch(mode){
             case _BUILD:
                 if(tokenSize == escapeCharSize+1 && strncmp(token,*escapeChar,escapeCharSize)==0){
@@ -191,21 +193,12 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
                 *head = insert(*head, token, "\0");
                 break;
             case _COMPRESS:
-<<<<<<< HEAD
-                Node* selectedNode= NULL;
-                int found = findAVLNode(&selectedNode, *head, token);
-                if(found != 0) errorPrint("FATAL ERROR: No code exists for this word", 1);
-                char toWrite[20];
-                sprintf(toWrite, "%d", selectedNode->val);
-                writeString(outputFd, toWrite);
-=======
                 found = findAVLNode(&selectedNode, *head, token);
                 if(found != 0){
                     printf("Fatal Error: No huffman code exists for a token: %s\n", token);
                     exit(1);
                 }
                 writeString(outputFd, selectedNode->codeString);
->>>>>>> ba0b09fc93c37627e38f75bed4216a2d66de2f45
                 break;
             case _DECOMPRESS:
 
@@ -216,164 +209,3 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
 
 }
 
-Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
-    int bytesRead = 0;
-    char[201] buffer;
-    char[201] carry;
-    char* escapeChar = (char*) malloc(sizeof(char));
-    *escapeChar = '\0';
-    char* escapeTemp;
-    int carryOverbool = 0;
-    int carryOverSize = 0;
-    do{
-        bytesRead = read(bookfd, buffer, 200);
-        if(bytesRead == -1) return NULL;
-        int index = 0;
-        buffer[bytesRead] = '\0';
-        while(buffer[index] != '\n' && buffer[index] != '\0'){
-            carry[index] = buffer[index];
-            index++;
-        }
-        if(buffer[index] == '\n'){
-            escapeTemp = (char*) malloc(carryOverSize+ index);
-            carry[index] = '\0';
-            strcpy(escapeTemp, escapeChar);
-            strcat(escapeTemp, carry);
-            free(escapeChar);
-            escapeChar = escapeTemp;
-            lseek(bookfd, SEEK_CUR, index+1-bytesRead +1);
-            break;
-        }
-
-        if(carryOverbool){
-            escapeTemp = (char*) malloc(index + carryOverSize +1);
-            carry[index] = '\0';
-            strcpy(escapeTemp, escapeChar);
-            strcat(escapeTemp, carry);
-            free(escapeChar);
-            escapeChar = escapeTemp;
-            carryOverSize+= bytesRead;
-        }
-        else{
-            carryOverbool = 1;
-            escapeChar = (char*) malloc(bytesRead+1);
-            carry[index] = '\0';
-            strcpy(escapeChar, carry);
-            carryOverSize += bytesRead;
-        }
-        
-        
-    }while(bytesRead >0);
-
-    bytesRead = 0;
-    char* wordTemp;
-    
-    char* codeTemp;
-    int codeBool = 1;
-    int wordCarryOverSize = 0;
-    int codeCarryOverSize = 0;
-    int startIndex = 0;
-    Node* head = NULL;
-    do{
-        bytesRead = read(bookfd, buffer, 200);
-        if (bytesRead == -1) return NULL;
-        int index = 0;
-        buffer[bytesRead] = '\0';
-        char* word = (char*) malloc(sizeof(char));
-        *word= '\0';
-        char* code = (char*) malloc(sizeof(char));
-        *code = '\0';
-        while (index <= bytesRead){
-            if(buffer[index] == '\t'){
-                codeTemp = (char*) malloc(codeCarryOverSize + (index - startIndex));
-                buffer[index] = '\0';
-                strcpy(codeTemp, code);
-                strcat(codeTemp, buffer[startIndex]);
-                free(code);
-                code = codeTemp;
-                codeBool = 0; codeCarryOverSize = 0;
-                startIndex = index +1;
-            }
-            else if(buffer[index] == '\n'){
-                wordTemp = (char*) malloc(index -startIndex + wordCarryOverSize);
-                buffer[index] = '\0';
-                strcpy(wordTemp, word);
-                strcat(wordTemp, buffer[startIndex]);
-                free(word);
-                word = wordTemp;
-                wordCarryOverSize = 0; codeBool = 1;
-                int len = strlen(escapeChar);
-                if(strncmp(word, escapeChar, len) == 0){
-                    if(word[len] == 'n'){
-                        free(word);
-                        *word = '\n';
-                    }
-                    else if(word[len] == 't'){
-                        free(word);
-                        *word = '\t';
-                    }
-                    else if(word[len] == 'r'){
-                        free(word);
-                        *word = '\r';
-                    }
-                }
-                head = treeInsert(head, word, code);
-            }
-            else if(buffer[index] == '\0'){
-                if(codeBool){
-                    codeTemp = (char*) malloc(index - startIndex + codeCarryOverSize);
-                    strcpy(codeTemp, code);
-                    strcat(codeTemp, buffer[startIndex]);
-                    free(code);
-                    code = codeTemp;
-                    codeCarryOverSize += index-startIndex;
-                }
-                else{
-                    wordTemp = (char*) malloc(index - startIndex + wordCarryOverSize);
-                    strcpy(wordTemp, word);
-                    strcat(wordTemp, buffer[startIndex]);
-                    free(word);
-                    word = wordTemp;
-                    wordCarryOverSize += index - startIndex;
-                }
-            }
-            index++;
-        }
-            /*
-            if(wordCarryOverbool){
-                wordTemp = (char*) malloc(sizeof(char)*index + wordCarryOverSize+1);
-                carry[index] = '\0';
-                strcpy(wordTemp, word);
-                strcat(wordTemp, carry);
-                free(word);
-                word = wordTemp;
-                wordCarryOverSize += bytesRead; 
-            }
-            else if(wordBool){
-                wordCarryOverbool = 1;
-                free(word);
-                word = (char*) malloc(sizeof(char)*bytesRead+1);
-                carry[index] = '\0';
-                strcpy(word, carry);
-                wordCarryOverSize+= bytesRead;
-            }
-            if(codeCarryOverbool){
-                codeTemp = (char*) malloc(sizeof(char)* index + codeCarryOverSize+1);
-                carry[index] = '\0';
-                strcpy(codeTemp, code);
-                strcat(codeTemp, carry);
-                free(code);
-                code = codeTemp;
-                codeCarryOverSize += bytesRead;
-            }
-            else if(codeBool){
-                codeCarryOverbool = 1;
-                free(code);
-                code = (char*) malloc(sizeof(char)*bytesRead+1);
-                carry[index] = '\0';
-                strcpy(code, carry);
-                codeCarryOverSize+=bytesRead;
-            }*/
-    }while(bytesRead > 0);
-    return head;
-}
