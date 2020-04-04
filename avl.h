@@ -13,7 +13,7 @@ typedef struct  node{
 
 int max(int, int);
 int height(Node*);
-Node* makeNode(char*);
+Node* makeNode(char*, char*);
 Node* RR(Node*);
 Node* LR(Node*);
 int balanceFactor(Node*);

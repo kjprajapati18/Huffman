@@ -41,8 +41,23 @@ int flagCheck(int argc, char* argv[]){
     if((bcdFlag == _BUILD && argc != 3+recursive) || (bcdFlag & (_COMPRESS|_DECOMPRESS) && argc != 4+recursive)) errorPrint("Fatal Error: Incorrect number of arguments for given flags", 1);
 
     //Make sure that a proper codebook is given if we are compressing or decompressing
-    if(bcdFlag & (_COMPRESS|_DECOMPRESS) && strcmp("HuffmanCodebook", argv[3+recursive])) errorPrint("Fatal Error: The codebook should be called 'HuffmanCodebook.'", 1);
+    if(bcdFlag & (_COMPRESS|_DECOMPRESS) && strcmp("HuffmanCodebook", argv[3+recursive]+strlen(argv[3+recursive])-15)) errorPrint("Fatal Error: The codebook should be called 'HuffmanCodebook.'", 1);
 
+    //Check the file extension to make sure that only decompress gets .hcz
+    if(!recursive){
+        int indexOfExtension = strlen(argv[2])-4;   //If the extension is more than 3 chars, then its not .hcz anyways
+        switch (bcdFlag){
+            case _BUILD:
+            case _COMPRESS:
+                if(strcmp(argv[2]+indexOfExtension, ".hcz") == 0) errorPrint("Fatal Error: You cannot compress a .hcz file or build a codebook with it.", 1);
+                break;
+            case _DECOMPRESS:
+                if(strcmp(argv[2]+indexOfExtension, ".hcz") != 0) errorPrint("Fatal Error: You can only decompress a .hcz file.", 1);
+                break;
+            default:
+                break;
+        }
+    }
     return bcdFlag;
 }
 
@@ -182,7 +197,8 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
 }
 
 int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int escapeCharSize, int outputFd, int mode){
-
+    Node* selectedNode;
+    int found;
         switch(mode){
             case _BUILD:
                 if(tokenSize == escapeCharSize+1 && strncmp(token,*escapeChar,escapeCharSize)==0){
@@ -191,12 +207,9 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
                 *head = insert(*head, token, "\0");
                 break;
             case _COMPRESS:
-                Node* selectedNode= NULL;
-                int found = findAVLNode(&selectedNode, *head, token);
+                found = findAVLNode(&selectedNode, *head, token);
                 if(found != 0) errorPrint("FATAL ERROR: No code exists for this word", 1);
-                char toWrite[20];
-                sprintf(toWrite, "%d", selectedNode->val);
-                writeString(outputFd, toWrite);
+                writeString(outputFd, selectedNode->codeString);
                 break;
             case _DECOMPRESS:
 
@@ -208,6 +221,7 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
 }
 
 Node* codebookAvl(int bookfd){
+    return NULL;
     int bytesRead = 0;
     char[201] buffer;
     char[201] carry;

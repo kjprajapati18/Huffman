@@ -90,9 +90,9 @@ Node* insert(Node* node, char* word, char* code){
     } 
 
     if(strcmp(word, node->string) < 0)
-        node->left = insert(node->left, word);
+        node->left = insert(node->left, word, code);
     else if(strcmp(word, node->string) > 0)
-        node->right = insert(node->right, word);
+        node->right = insert(node->right, word, code);
     else{
         (node->val)++;
         return node;

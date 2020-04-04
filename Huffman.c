@@ -16,7 +16,7 @@
 #include "minheap.h"
 #include "codebookWriter.h"
 #include "inputHandler.h"
-void performOperation (int mode, int input);
+void performOperation (int mode, int codeBook, char* inputPath);
 void buildHuffmanCodebook(int input);
 #define _ESCAPECHAR '\\'
 /* TO DO LIST:::::::::::
@@ -29,6 +29,8 @@ void buildHuffmanCodebook(int input);
     -Write siftUp
     -Create insert with siftUp
     -Pop with siftDown
+
+    -Split buildhuffman into buildhuffman and build avl
 
     QUESTIONS?
     -compress/decompress with blank codebook what do?
@@ -57,9 +59,10 @@ int main(int argc, char* argv[]){
         return 0;
     }
 
-    int input = open(argv[2], O_RDONLY);
-    performOperation(bcdFlag, input);
-    close(input);
+    int codeBook;
+    if(bcdFlag != _BUILD) codeBook = open(argv[3], O_RDONLY);
+    else codeBook = -1;
+    performOperation(bcdFlag, codeBook, argv[2]);
 
     return 0;
 /*
@@ -117,23 +120,40 @@ int main(int argc, char* argv[]){
 }
 
 
-void performOperation (int mode, int input){
-
+void performOperation (int mode, int codeBook, char* inputPath){
+    int input = open(inputPath, O_RDONLY);
     if(input < 0) errorPrint("Could not open input file", 1);
-    
+    if(mode != _BUILD && codeBook < 0) errorPrint("Could not open codebook file", 1);
+
+    int inputPathLength = strlen(inputPath);
+    char* outputName, escapeChar;
+
     switch (mode){
-    case _BUILD:
-        buildHuffmanCodebook(input);
-        break;
-    case _COMPRESS:
+        case _BUILD:
+            outputName = malloc(1); //Malloc space because we will free no matter what
+            buildHuffmanCodebook(input);
+            break;
+        case _COMPRESS:
+            outputName = (char*) malloc(sizeof(char)*(inputPathLength+5));
+            outputName[0] = '\0';
+            strcpy(outputName, inputPath);
+            strcat(outputName, ".hcz");
 
-        break;
-    case _DECOMPRESS:
+            Node* headAVL = codebookAvl(codeBook); //PASS ESCAPE CHAR HERE
+            int output = open(outputName, O_WRONLY | O_CREAT, 00600);
+            getInput(&headAVL, input, NULL, output, mode);
 
-        break;
-    default:
-        break;
+            close(output);
+            break;
+        case _DECOMPRESS:
+
+            break;
+        default:
+            break;
     }
+    
+    close(input);
+    free(outputName);
 }
 
 void buildHuffmanCodebook(int input){
@@ -144,7 +164,7 @@ void buildHuffmanCodebook(int input){
     escapeChar[1] = '\0';
 
     int inputCheck; 
-    inputCheck = getInput(&head, input, &escapeChar, _BUILD);
+    inputCheck = getInput(&head, input, &escapeChar, 0, _BUILD);
     if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //expand to different errors, but also make a different function to handle the differnt error
     
     /*if(head !=NULL) print2DTree(head, 0);
