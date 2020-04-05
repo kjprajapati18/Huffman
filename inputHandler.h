@@ -26,7 +26,7 @@ int getInput(Node**, int, char**, int, int);
 //handles incoming escape characters in file
 int incEscapeChar(char**, int*);
 
-int readHandler(Node**, char*, int, char**, int, int, int);
+int readHandler(Node**, char*, int, char**, int*, int, int);
 
 //makes avl from huffman codebook
 Node* codebookAvl(int, Node* (Node*, char*, char*));

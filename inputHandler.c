@@ -130,7 +130,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
                     free(carryOver);
                     carryOver = temp;
 
-                    readHandler(&list, carryOver, carryOverSize, escapeChar, escapeCharSize, outputFd, mode);
+                    readHandler(&list, carryOver, carryOverSize, escapeChar, &escapeCharSize, outputFd, mode);
                     /*
                     if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
                         incEscapeChar(escapeChar, &escapeCharSize);
@@ -138,7 +138,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
                     list = insert(list, carryOver);*/
                     carryOverSize = 0;
                 } else {
-                    readHandler(&list, buffer+startIndex, i-startIndex, escapeChar, escapeCharSize, outputFd, mode);
+                    readHandler(&list, buffer+startIndex, i-startIndex, escapeChar, &escapeCharSize, outputFd, mode);
                     /*if(i-startIndex == escapeCharSize+1 && strncmp(buffer+startIndex,*escapeChar,escapeCharSize)==0){
                         incEscapeChar(escapeChar, &escapeCharSize);
                     }
@@ -146,7 +146,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
                 }
 
 	            startIndex = i+1;
-                readHandler(&list, delimiter, 1, escapeChar, escapeCharSize, outputFd, mode); //Add the space that caused us to enter this point
+                readHandler(&list, delimiter, 1, escapeChar, &escapeCharSize, outputFd, mode); //Add the space that caused us to enter this point
             }
         }
 
@@ -170,7 +170,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
     }while(bytesRead>0);
     
     if(carryOverSize !=0){
-        readHandler(&list, carryOver, carryOverSize, escapeChar, escapeCharSize, outputFd, mode);
+        readHandler(&list, carryOver, carryOverSize, escapeChar, &escapeCharSize, outputFd, mode);
         /*if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
             incEscapeChar(escapeChar, &escapeCharSize);
         }
@@ -199,13 +199,15 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
 }
 
 
-int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int escapeCharSize, int outputFd, int mode){
+int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int* escapeCharSize, int outputFd, int mode){
     Node* selectedNode;
     int found;
         switch(mode){
             case _BUILD:
-                if(tokenSize == escapeCharSize+1 && strncmp(token,*escapeChar,escapeCharSize)==0){
-                    incEscapeChar(escapeChar, &escapeCharSize);
+                //printf("%d v.s. %d\n", tokenSize, escapeCharSize);
+                if(tokenSize == (*escapeCharSize)+1 && strncmp(token, *escapeChar, *escapeCharSize)==0){
+                    //printf("Doubleing escapeChar");
+                    incEscapeChar(escapeChar, escapeCharSize);
                 }
                 *head = insert(*head, token, "\0");
                 break;
