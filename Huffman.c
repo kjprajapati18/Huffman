@@ -226,7 +226,7 @@ void buildHuffmanCodebook(int input){
     close(book);
 }
 
-
+/*
 int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
     if(head == NULL) return -1;
     int bitLength = strlen(bitString);
@@ -265,7 +265,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
                 break;
             default:
                 break;
-        }*/
+        }*//*
         
         char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
 
@@ -368,7 +368,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
         /*char* word = (char*) malloc(sizeof(char));
         *word= '\0';
         char* code = (char*) malloc(sizeof(char));
-        *code = '\0';*/
+        *code = '\0';*//*
         while (index <= bytesRead){
             
             if(buffer[index] == '\t'){
@@ -440,7 +440,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
     }while(bytesRead > 0);
     return head;
 }
-
+*/
 //checks the first 2 flags to see what we're doing and if it's recursive or not
 /*int flagCheck(char* argv[]){
     int pos;
