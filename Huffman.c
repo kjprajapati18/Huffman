@@ -220,9 +220,9 @@ void buildHuffmanCodebook(int input){
     writeString(book, "\n");
     writeCodebook(minHeap[0], book, escapeChar, "");
 
-    freeAvl(head);
-    free(escapeChar);
-    freeHuff(minHeap[0]);
+    //freeAvl(head);
+    //free(escapeChar);
+    //freeHuff(minHeap[0]);
     close(book);
 }
 

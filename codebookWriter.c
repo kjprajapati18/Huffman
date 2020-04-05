@@ -19,15 +19,34 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
         int booleanIsSpace = isspace(head->token[0]) && strcmp(head->token, " ");      //Is a control character space
 
         //Just need to finish writeString function && escapeCharHandler function
-        char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
+        int size = strlen(escapeChar);
+        char* controlString = (char*) malloc(sizeof(char) * (size+2));
+        memcpy(controlString, escapeChar, size+1);
+        controlString[size+1] = '\0';
+
+        switch ((head->token)[0]){
+            case '\t':
+                controlString[size] = 't';
+                break;
+            case '\n':
+                controlString[size] = 'n';
+                break;
+            case '\r':
+                controlString[size] = 'r';
+                break;
+            default:
+                break;
+
+        
+        char* inputtedToken = booleanIsSpace? controlString : head->token;
 
         strcat(temp, inputtedToken);
         strcat(temp, "\n");
 
         writeString(fd, temp);
-        free(temp);
         
-        if(booleanIsSpace) free(inputtedToken);
+        free(temp);
+        free(controlString);
         return 0;
     }
 
