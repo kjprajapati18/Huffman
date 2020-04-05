@@ -15,35 +15,14 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
         int size = strlen(escapeChar);
         
         if(booleanIsSpace){
-            temp = (char*) malloc((bitLength+size+4)*sizeof(char));    //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
+            temp = (char*) malloc((bitLength+size+4)*sizeof(char));                     //bitLength + escapeCharSize + 4 (null term, tab, newline, & controlcode letter)
         } else {
-            temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));
+            temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));     //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
         }    
 
         memcpy(temp, bitString, bitLength);
         temp[bitLength] = '\t';
         temp[bitLength+1] = '\0';
-
-//        int booleanIsSpace = isspace(head->token[0]) && strcmp(head->token, " "); 
-
-        //Just need to finish writeString function && escapeCharHandler function
-        /*char* controlString = (char*) malloc(sizeof(char) * (size+2));
-        memcpy(controlString, escapeChar, size+1);
-        controlString[size+1] = '\0';
-
-        switch ((head->token)[0]){
-            case '\t':
-                controlString[size] = 't';
-                break;
-            case '\n':
-                controlString[size] = 'n';
-                break;
-            case '\r':
-                controlString[size] = 'r';
-                break;
-            default:
-                break;
-        }*/
         
         char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
 
@@ -67,7 +46,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
     if(head->left != NULL)writeCodebook(head->left, fd, escapeChar, newString);
 
     newString[bitLength] = '1';
-    if(head->left != NULL)writeCodebook(head->right, fd, escapeChar, newString);
+    if(head->right != NULL)writeCodebook(head->right, fd, escapeChar, newString);
 
     free(newString);
     return 0;

@@ -119,7 +119,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
 	        if (isspace(buffer[i])){
                 delimiter[0] = buffer[i];
-                //readHandler(&list, delimiter, 1, escapeChar, escapeCharSize, outputFd, mode);
+
                 buffer[i] = '\0';
 
                 if(carryOverSize != 0){ //realloc, add tree, check/change escape char
@@ -131,18 +131,9 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
                     carryOver = temp;
 
                     readHandler(&list, carryOver, carryOverSize, escapeChar, &escapeCharSize, outputFd, mode);
-                    /*
-                    if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
-                        incEscapeChar(escapeChar, &escapeCharSize);
-                    }
-                    list = insert(list, carryOver);*/
                     carryOverSize = 0;
                 } else {
                     readHandler(&list, buffer+startIndex, i-startIndex, escapeChar, &escapeCharSize, outputFd, mode);
-                    /*if(i-startIndex == escapeCharSize+1 && strncmp(buffer+startIndex,*escapeChar,escapeCharSize)==0){
-                        incEscapeChar(escapeChar, &escapeCharSize);
-                    }
-                    list = insert(list, buffer+startIndex);*/
                 }
 
 	            startIndex = i+1;
@@ -172,10 +163,6 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
     
     if(carryOverSize !=0){
         readHandler(&list, carryOver, carryOverSize, escapeChar, &escapeCharSize, outputFd, mode);
-        /*if(carryOverSize == escapeCharSize+1 && strncmp(carryOver,*escapeChar,escapeCharSize)==0){
-            incEscapeChar(escapeChar, &escapeCharSize);
-        }
-        list = insert(list, carryOver);*/
     }
 
     free(carryOver);
@@ -203,30 +190,27 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
 int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int* escapeCharSize, int outputFd, int mode){
     Node* selectedNode;
     int found;
-        switch(mode){
-            case _BUILD:
-                //printf("%d v.s. %d\n", tokenSize, escapeCharSize);
-                if(tokenSize == (*escapeCharSize)+1 && strncmp(token, *escapeChar, *escapeCharSize)==0){
-                    //printf("Doubleing escapeChar");
-                    incEscapeChar(escapeChar, escapeCharSize);
-                }
-                *head = insert(*head, token, "\0");
-                break;
-            case _COMPRESS:
-                if(*token == '\0') return 0;
-                found = findAVLNode(&selectedNode, *head, token);
-                //printf("%d\n", found);
-                if(found != 0){
-                    printf("Fatal Error: No huffman code exists for a token: %s\n", token);
-                    exit(1);
-                }
-                writeString(outputFd, selectedNode->codeString);
-                break;
-            case _DECOMPRESS:
-
-                break;
-            default:
-                break;
+    switch(mode){
+        case _BUILD:
+                
+            if(tokenSize == (*escapeCharSize)+1 && strncmp(token, *escapeChar, *escapeCharSize)==0){
+                incEscapeChar(escapeChar, escapeCharSize);
+            }
+            *head = insert(*head, token, "\0");
+            break;
+        case _COMPRESS:
+            if(*token == '\0') return 0;
+            found = findAVLNode(&selectedNode, *head, token);
+            if(found != 0){
+                printf("Fatal Error: No huffman code exists for a token: %s\n", token);
+                exit(1);
+            }
+            writeString(outputFd, selectedNode->codeString);
+            break;
+        case _DECOMPRESS:
+        default:
+            errorPrint("Fatal Error: Bad flag...", 1);
+            break;
         }
     return 0;//change to vodi prolly
 }
@@ -256,7 +240,6 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
             strcat(escapeTemp, carry);
             free(escapeChar);
             escapeChar = escapeTemp;
-            //lseek(bookfd, index+1, SEEK_SET);
             break;
         }
 
@@ -301,11 +284,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
         int index = 0;
         int startIndex = 0;
         buffer[bytesRead] = '\0';
-        //printf("Buffer: %s \n\n", buffer);
-        /*char* word = (char*) malloc(sizeof(char));
-        *word= '\0';
-        char* code = (char*) malloc(sizeof(char));
-        *code = '\0';*/
+        
         while (index <= bytesRead){
             
             if(buffer[index] == '\t'){
@@ -344,14 +323,13 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                     }
                     word[1] = '\0';
                 }
-                //printf("\n\n%s\n\n", word);
+                
                 head = treeInsert(head, word, code);
                 *word = '\0';
                 *code = '\0';
                 startIndex = index +1;
             }
             else if(buffer[index] == '\0'){
-                //printf("\n\n in carryover code\n\n");
                 if(codeBool){
                     codeTemp = (char*) malloc(index - startIndex + codeCarryOverSize+1);
                     *codeTemp = '\0';

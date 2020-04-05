@@ -5,28 +5,6 @@
 #include "inputHandler.h"
 #define COUNT 10
 
-/*int main(int argc, char* argv[]){
-    char* test1 = "test1";
-    char* test2 = "test2";
-    char* test3 = "add";
-    char* test4 = "badd";
-    char* test5 = "aed";
-    char* test6 = "aee";
-    Node* head = NULL;
-    head = insert(head, test1);
-    print2DTree(head, 0);
-    head = insert(head, test2);
-    print2DTree(head, 0);
-    head = insert(head, test3);
-    print2DTree(head, 0);
-    head = insert(head, test4);
-    print2DTree(head, 0);
-    head = insert(head, test5);
-    print2DTree(head, 0);
-    head = insert(head, test5);
-    print2DTree(head, 0);
-    printf("\n\n%d\n\n", tokens);
-}*/
 //helper method to find max of 2 numbers. returns 2nd number if equal
 int max(int a, int b){
     return (a>b)? a: b;

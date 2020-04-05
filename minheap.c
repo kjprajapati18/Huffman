@@ -3,18 +3,7 @@
 #include <string.h>
 #include "minheap.h"
 
-/*int main(int argc, char* argv[]){
-    treeNode* test1 = (treeNode*) malloc(sizeof(treeNode));
-    treeNode* test2 = (treeNode*) malloc(sizeof(treeNode));
-    test1->freq = 10;
-    test2->freq = 15;
-    insertHeap(test1);
-    insertHeap(test2);
-    int i;
-    for(i = 0; i < HeapSize; i++){
-        printf("%d\n", minHeap[i]->freq);
-    }
-}*/
+
 void swap(treeNode** a, treeNode** b){
     treeNode* temp = *a;
     *a = *b;
