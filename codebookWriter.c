@@ -5,22 +5,28 @@
 #include <unistd.h>
 #include "codebookWriter.h"
 
-/*int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
+int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
     if(head == NULL) return -1;
     int bitLength = strlen(bitString);
 
     if(head->left == NULL && head->right == NULL){ //Leaf Node, add to book
-        char* temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));    //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
-
+        int booleanIsSpace = isspace(head->token[0]) && strcmp(head->token, " ");     //Is a control character space
+        char* temp;
+        int size = strlen(escapeChar);
+        
+        if(booleanIsSpace){
+            temp = (char*) malloc((bitLength+size+3)*sizeof(char));    //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
+        } else {
+            temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));
+        }    
         memcpy(temp, bitString, bitLength);
         temp[bitLength] = '\t';
         temp[bitLength+1] = '\0';
 
-        int booleanIsSpace = isspace(head->token[0]) && strcmp(head->token, " ");      //Is a control character space
+//        int booleanIsSpace = isspace(head->token[0]) && strcmp(head->token, " "); 
 
         //Just need to finish writeString function && escapeCharHandler function
-        int size = strlen(escapeChar);
-        char* controlString = (char*) malloc(sizeof(char) * (size+2));
+        /*char* controlString = (char*) malloc(sizeof(char) * (size+2));
         memcpy(controlString, escapeChar, size+1);
         controlString[size+1] = '\0';
 
@@ -36,9 +42,9 @@
                 break;
             default:
                 break;
-        }
+        }*/
         
-        char* inputtedToken = booleanIsSpace? controlString : head->token;
+        char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
 
         strcat(temp, inputtedToken);
         strcat(temp, "\n");
@@ -46,7 +52,7 @@
         writeString(fd, temp);
         
         free(temp);
-        free(controlString);
+        if(booleanIsSpace) free(inputtedToken);
         return 0;
     }
 
@@ -64,7 +70,7 @@
 
     free(newString);
     return 0;
-}*/
+}
 
 int writeString(int fd, char* string){
 
