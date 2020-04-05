@@ -230,7 +230,7 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int*
         }
     return 0;//change to vodi prolly
 }
-
+/*
 Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
     int bytesRead = 0;
     char buffer[201];
@@ -304,7 +304,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
         /*char* word = (char*) malloc(sizeof(char));
         *word= '\0';
         char* code = (char*) malloc(sizeof(char));
-        *code = '\0';*/
+        *code = '\0';*//*
         while (index <= bytesRead){
             
             if(buffer[index] == '\t'){
@@ -373,7 +373,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
         }
     }while(bytesRead > 0);
     return head;
-}
+}*/
 
 int decompressFile(Node* head, int input, int output){
     
