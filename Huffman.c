@@ -416,7 +416,8 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
             else if(buffer[index] == '\0'){
                 //printf("\n\n in carryover code\n\n");
                 if(codeBool){
-                    codeTemp = (char*) malloc(index - startIndex + codeCarryOverSize);
+                    codeTemp = (char*) malloc(index - startIndex + codeCarryOverSize+1);
+		    *codeTemp = '\0';
                     strcpy(codeTemp, code);
                     strcat(codeTemp, buffer+startIndex);
                     free(code);
@@ -424,7 +425,8 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                     codeCarryOverSize += index-startIndex;
                 }
                 else{
-                    wordTemp = (char*) malloc(index - startIndex + wordCarryOverSize);
+                    wordTemp = (char*) malloc(index - startIndex + wordCarryOverSize+1);
+		    *wordTemp = '\0';
                     strcpy(wordTemp, word);
                     strcat(wordTemp, buffer+startIndex);
                     free(word);
