@@ -36,7 +36,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
                 break;
             default:
                 break;
-
+        }
         
         char* inputtedToken = booleanIsSpace? controlString : head->token;
 
