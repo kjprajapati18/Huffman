@@ -119,7 +119,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
             if (buffer[i] == '\0') break;       //I don't think this line is needed but im too scared to remove
 	        if (isspace(buffer[i])){
                 delimiter[0] = buffer[i];
-                readHandler(&list, delimiter, 1, escapeChar, escapeCharSize, outputFd, mode);                            //list = insert(list, delimiter);
+                //readHandler(&list, delimiter, 1, escapeChar, escapeCharSize, outputFd, mode);
                 buffer[i] = '\0';
 
                 if(carryOverSize != 0){ //realloc, add tree, check/change escape char
@@ -146,6 +146,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
                 }
 
 	            startIndex = i+1;
+                readHandler(&list, delimiter, 1, escapeChar, escapeCharSize, outputFd, mode); //Add the space that caused us to enter this point
             }
         }
 
