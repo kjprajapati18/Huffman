@@ -42,8 +42,23 @@ int flagCheck(int argc, char* argv[]){
     if((bcdFlag == _BUILD && argc != 3+recursive) || (bcdFlag & (_COMPRESS|_DECOMPRESS) && argc != 4+recursive)) errorPrint("Fatal Error: Incorrect number of arguments for given flags", 1);
 
     //Make sure that a proper codebook is given if we are compressing or decompressing
-    if(bcdFlag & (_COMPRESS|_DECOMPRESS) && strcmp("HuffmanCodebook", argv[3+recursive])) errorPrint("Fatal Error: The codebook should be called 'HuffmanCodebook.'", 1);
+    if(bcdFlag & (_COMPRESS|_DECOMPRESS) && strcmp("HuffmanCodebook", argv[3+recursive]+strlen(argv[3+recursive])-15)) errorPrint("Fatal Error: The codebook should be called 'HuffmanCodebook.'", 1);
 
+    //Check the file extension to make sure that only decompress gets .hcz
+    if(!recursive){
+        int indexOfExtension = strlen(argv[2])-4;   //If the extension is more than 3 chars, then its not .hcz anyways
+        switch (bcdFlag){
+            case _BUILD:
+            case _COMPRESS:
+                if(strcmp(argv[2]+indexOfExtension, ".hcz") == 0) errorPrint("Fatal Error: You cannot compress a .hcz file or build a codebook with it.", 1);
+                break;
+            case _DECOMPRESS:
+                if(strcmp(argv[2]+indexOfExtension, ".hcz") != 0) errorPrint("Fatal Error: You can only decompress a .hcz file.", 1);
+                break;
+            default:
+                break;
+        }
+    }
     return bcdFlag;
 }
 

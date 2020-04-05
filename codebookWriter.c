@@ -38,10 +38,10 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
     
     newString[bitLength] = '0';
     int stringLength = strlen(newString);
-    writeCodebook(head->left, fd, escapeChar, newString);
+    if(head->left != NULL)writeCodebook(head->left, fd, escapeChar, newString);
 
     newString[bitLength] = '1';
-    writeCodebook(head->right, fd, escapeChar, newString);
+    if(head->left != NULL)writeCodebook(head->right, fd, escapeChar, newString);
 
     free(newString);
     return 0;

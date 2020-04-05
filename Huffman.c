@@ -201,6 +201,7 @@ void buildHuffmanCodebook(int input){
         insertHeap(minHeap, newNode);
     }
     printf("%d", HeapSize);
+    print2DTreeNode(minHeap[0], 0);
     //////////////////////////
     
     remove("./HuffmanCodebook");
