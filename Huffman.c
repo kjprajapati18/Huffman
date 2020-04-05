@@ -235,11 +235,12 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
         char* temp;
         int size = strlen(escapeChar);
         
-        if(booleanIsSpace){
+	if(booleanIsSpace){
             temp = (char*) malloc((bitLength+size+3)*sizeof(char));    //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
         } else {
             temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));
-        }    
+	}
+	//temp = (char*) malloc(1000);
         memcpy(temp, bitString, bitLength);
         temp[bitLength] = '\t';
         temp[bitLength+1] = '\0';
@@ -291,7 +292,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
 
     free(newString);
     return 0;
-
+}
 
 /*
 int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
