@@ -156,6 +156,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
                 free(carryOver);
                 carryOverSize = bytesRead-startIndex;
                 carryOver = (char *) malloc(sizeof(char) * (carryOverSize+1));
+                *carryOver = '\0';
                 strcpy(carryOver, buffer+startIndex);
             } else {
                 carryOverSize += bytesRead-startIndex;
