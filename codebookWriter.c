@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "codebookWriter.h"
 
-int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
+/*int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
     if(head == NULL) return -1;
     int bitLength = strlen(bitString);
 
@@ -71,7 +71,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
 
     free(newString);
     return 0;
-}
+}*/
 
 int writeString(int fd, char* string){
 
