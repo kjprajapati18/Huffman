@@ -237,7 +237,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
         int size = strlen(escapeChar);
         
         if(booleanIsSpace){
-            temp = (char*) malloc((bitLength+size+3)*sizeof(char));    //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
+            temp = (char*) malloc((bitLength+size+4)*sizeof(char));    //bitLength(for code) + 3 (for null-term, tab, and newline) + strlen(for token)
         } else {
             temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));
         }    

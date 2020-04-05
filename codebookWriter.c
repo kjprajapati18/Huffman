@@ -43,7 +43,7 @@
                 break;
             default:
                 break;
-        }*/
+        }
         
         char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
 
