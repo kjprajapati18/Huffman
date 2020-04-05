@@ -61,7 +61,7 @@ void insertHeap(treeNode* minHeap[], treeNode* newNode){
         HeapSize+=1;
         int i = HeapSize/2 -1;
         for (i; i >= 0; i--){
-            heapify(minHeap, i);
+            heapify(minHeap, i);            //PLease SiftUp
         }
     }
 }

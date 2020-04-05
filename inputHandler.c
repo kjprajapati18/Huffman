@@ -226,6 +226,7 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int 
         }
     return 0;//change to vodi prolly
 }
+
 Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
     int bytesRead = 0;
     char buffer[201];
@@ -371,3 +372,54 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
     return head;
 }
 
+/*
+int decompressFile(Node* head, int input, int output){
+    
+    if(head == NULL) return -1;
+
+    int bytesRead = 1;
+    char buffer[201];
+
+    //If words aren't complete by the time read returns, we need to carry the word over.
+    Node* ptr = head;
+    int carryOverSize = 0;
+    int escapeCharSize = 1;
+    int i;
+    
+
+
+    do{
+        bytesRead = read(input, buffer, 200);
+        if(bytesRead == -1) return -1;
+        else if (bytesRead == 0) break;
+        buffer[bytesRead] = '\0';
+        for(i = 0; i<bytesRead; i++){
+            switch(buffer[i]){
+                case '0':
+                    ptr = ptr->left;
+                    break;
+                case '1':
+                    ptr = ptr->right;
+                    break;
+                case '\0':
+                    continue;
+                    break;
+                default:
+                    errorPrint("Fatal Error: .hcz file contains invalid characters", 1);
+                    break;
+            }
+
+            if(ptr->left == NULL && ptr->right == NULL){
+                writeString(output, ptr->string);
+                ptr = head;
+            }
+        }
+    } while (bytesRead >0);
+
+    if(ptr != head){ //there was leftover or extra bits, caused by changed encryption, changed codebook, or incorrect codebook
+        printf("Error: Codebook did not line up with encryption. Left over bits were thrown out\n");
+    }
+
+    return 0;
+}
+*/

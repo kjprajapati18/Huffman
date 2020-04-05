@@ -146,10 +146,10 @@ void performOperation (int mode, int codeBook, char* inputPath){
             getInput(&headAVL, input, NULL, outputComp, mode);
 
             close(outputComp);
+            free(headAVL);
             break;
         case _DECOMPRESS:
             headAVL = codebookAvl(codeBook, rebuildHuffman);        //ADD FUNCTION POINTER WHEN IMPOLEMENTED
-
             // String manipulation to figure out output filename here
             outputName = (char*) malloc(sizeof(char)*(inputPathLength+5));
             outputName[0] = '\0';
@@ -158,10 +158,12 @@ void performOperation (int mode, int codeBook, char* inputPath){
 
             // Here is going to be writing the decompress function (new function)
             int outputDecomp = open(outputName, O_WRONLY | O_CREAT, 00600);
-
-
+            if(*(headAVL->string) == ' ') printf("\n\nYEA\n\n", headAVL->string);
+            print2DTree(headAVL, 0);
+            decompressFile(headAVL, input, outputDecomp);
             // close and free
             close(outputDecomp);
+            free(headAVL);
             break;
         default:
             break;
@@ -194,11 +196,20 @@ void buildHuffmanCodebook(int input){
     for(i = tokens -1; i >= 0; i --){
         heapify(minHeap, i);
     }                                                                                   ///////////// LETS MOVE ALL OF THIS TO A FUNCTION IN any other file
-    while(HeapSize >1){
-        treeNode* less = pop(minHeap);
-        treeNode* great = pop(minHeap);
-        treeNode* newNode = merge(less, great);
-        insertHeap(minHeap, newNode);
+
+    //Add the 0 case
+
+    if(HeapSize == 1){  //1 Token read
+        treeNode* solo = pop(minHeap);
+        treeNode* newRoot = merge(solo, NULL);
+        insertHeap(minHeap, newRoot); 
+    } else {
+        while(HeapSize >1){
+            treeNode* less = pop(minHeap);
+            treeNode* great = pop(minHeap);
+            treeNode* newNode = merge(less, great);
+            insertHeap(minHeap, newNode);
+        }
     }
     printf("%d", HeapSize);
     print2DTreeNode(minHeap[0], 0);
@@ -219,6 +230,56 @@ void buildHuffmanCodebook(int input){
     free(escapeChar);
     freeHuff(minHeap[0]);
     close(book);
+}
+
+int decompressFile(Node* head, int input, int output){
+    
+    if(head == NULL) return -1;
+
+    int bytesRead = 1;
+    char buffer[201];
+
+    //If words aren't complete by the time read returns, we need to carry the word over.
+    Node* ptr = head;
+    int carryOverSize = 0;
+    int escapeCharSize = 1;
+    int i;
+    
+
+
+    do{
+        bytesRead = read(input, buffer, 200);
+        if(bytesRead == -1) return -1;
+        else if (bytesRead == 0) break;
+        buffer[bytesRead] = '\0';
+        for(i = 0; i<bytesRead; i++){
+            switch(buffer[i]){
+                case '0':
+                    ptr = ptr->left;
+                    break;
+                case '1':
+                    ptr = ptr->right;
+                    break;
+                case '\0':
+                    continue;
+                    break;
+                default:
+                    errorPrint("Fatal Error: .hcz file contains invalid characters", 1);
+                    break;
+            }
+
+            if(ptr->left == NULL && ptr->right == NULL){
+                writeString(output, ptr->string);
+                ptr = head;
+            }
+        }
+    } while (bytesRead >0);
+
+    if(ptr != head){ //there was leftover or extra bits, caused by changed encryption, changed codebook, or incorrect codebook
+        printf("Error: Codebook did not line up with encryption. Left over bits were thrown out\n");
+    }
+
+    return 0;
 }
 
 //checks the first 2 flags to see what we're doing and if it's recursive or not

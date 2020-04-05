@@ -31,4 +31,6 @@ int readHandler(Node**, char*, int, char**, int, int, int);
 //makes avl from huffman codebook
 Node* codebookAvl(int, Node* (Node*, char*, char*));
 
+int decompressFile(Node* head, int input, int output);
+
 #endif 

@@ -189,11 +189,11 @@ Node* rebuildHuffman(Node* head, char* token, char* bitString){
         head = makeNode(token, bitString);
     }
 
-    if(*bitString = '0'){
+    if(*bitString == '0'){
         head->left = rebuildHuffman(head->left, token, bitString+1);
-    }else if(*bitString = '1'){
+    }else if(*bitString == '1'){
         head->right = rebuildHuffman(head->right, token, bitString+1);
-    }else if (*bitString != '\0'){
+    }else if (strlen(bitString) != 0){
         printf("Fatal Error: Huffman code for [%s] is [%s], which is not a bit string\n", token, bitString);
         exit(1);
     }
