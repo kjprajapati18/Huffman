@@ -19,6 +19,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
         } else {
             temp = (char*) malloc((bitLength+strlen(head->token)+3)*sizeof(char));
         }    
+
         memcpy(temp, bitString, bitLength);
         temp[bitLength] = '\t';
         temp[bitLength+1] = '\0';
