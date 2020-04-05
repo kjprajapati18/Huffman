@@ -256,7 +256,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
             strcat(escapeTemp, carry);
             free(escapeChar);
             escapeChar = escapeTemp;
-            lseek(bookfd, index+1, SEEK_SET);
+            //lseek(bookfd, index+1, SEEK_SET);
             break;
         }
 
@@ -288,18 +288,23 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
     int wordCarryOverSize = 0;
     int codeCarryOverSize = 0;
     int len = strlen(escapeChar);
+    lseek(bookfd, len+1, 0);
     Node* head = NULL;
-    
+    char* word = (char*) malloc(sizeof(char));
+    *word= '\0';
+    char* code = (char*) malloc(sizeof(char));
+    *code = '\0';
     do{
         bytesRead = read(bookfd, buffer, 200);
         if (bytesRead == -1) return NULL;
         int index = 0;
         int startIndex = 0;
         buffer[bytesRead] = '\0';
-        char* word = (char*) malloc(sizeof(char));
+        //printf("Buffer: %s \n\n", buffer);
+        /*char* word = (char*) malloc(sizeof(char));
         *word= '\0';
         char* code = (char*) malloc(sizeof(char));
-        *code = '\0';
+        *code = '\0';*/
         while (index <= bytesRead){
             
             if(buffer[index] == '\t'){
@@ -338,13 +343,14 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
                     }
                     word[1] = '\0';
                 }
-                
+                //printf("\n\n%s\n\n", word);
                 head = treeInsert(head, word, code);
                 *word = '\0';
                 *code = '\0';
                 startIndex = index +1;
             }
             else if(buffer[index] == '\0'){
+                //printf("\n\n in carryover code\n\n");
                 if(codeBool){
                     codeTemp = (char*) malloc(index - startIndex + codeCarryOverSize);
                     strcpy(codeTemp, code);
