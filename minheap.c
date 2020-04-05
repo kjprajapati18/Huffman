@@ -22,8 +22,9 @@ void swap(treeNode** a, treeNode** b){
 }
 
 void heapify(treeNode* minHeap[], int node){
+    
     if (HeapSize == 1){
-        printf("single element heap");
+        //printf("single element heap");
     }
     else{
         int min = minHeap[node]->freq;

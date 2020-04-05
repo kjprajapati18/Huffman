@@ -140,8 +140,8 @@ void performOperation (int mode, int codeBook, char* inputPath){
             strcpy(outputName, inputPath);
             strcat(outputName, "test.hcz");
 
-            headAVL = codebookAvl(codeBook, insert);       //ADD FUNCTION POINTER WHEN IMPLEMENTED
-            print2DTree(headAVL, 0);
+            headAVL = codebookAvl(codeBook, insert);
+            //print2DTree(headAVL, 0);
             int outputComp = open(outputName, O_WRONLY | O_CREAT, 00600);
             getInput(&headAVL, input, NULL, outputComp, mode);
 
@@ -149,17 +149,17 @@ void performOperation (int mode, int codeBook, char* inputPath){
             free(headAVL);
             break;
         case _DECOMPRESS:
-            headAVL = codebookAvl(codeBook, rebuildHuffman);        //ADD FUNCTION POINTER WHEN IMPOLEMENTED
+            headAVL = codebookAvl(codeBook, rebuildHuffman); 
             // String manipulation to figure out output filename here
             outputName = (char*) malloc(sizeof(char)*(inputPathLength+5));
             outputName[0] = '\0';
             strcpy(outputName, inputPath);
-            strcat(outputName, ".txt");         //THIS NEEDS TO BE CHANGED BEFORE WE SUBMIT
+            strcat(outputName, ".txt");         //THIS NEEDS TO BE CHANGED BEFORE WE SUBMIT/////////////////////////////////////////////////////
 
             // Here is going to be writing the decompress function (new function)
             int outputDecomp = open(outputName, O_WRONLY | O_CREAT, 00600);
-            if(*(headAVL->string) == ' ') printf("\n\nYEA\n\n", headAVL->string);
-            print2DTree(headAVL, 0);
+            //if(*(headAVL->string) == ' ') printf("\n\nYEA\n\n", headAVL->string);
+            //print2DTree(headAVL, 0);
             decompressFile(headAVL, input, outputDecomp);
             // close and free
             close(outputDecomp);
@@ -184,9 +184,7 @@ void buildHuffmanCodebook(int input){
     inputCheck = getInput(&head, input, &escapeChar, 0, _BUILD);
     if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //expand to different errors, but also make a different function to handle the differnt error
     
-    /*if(head !=NULL) print2DTree(head, 0);
-    else printf("\nHead is null\n");*/
-    
+
     //Put build huffman here
     HeapSize = tokens;
     treeNode* minHeap[HeapSize];
@@ -211,8 +209,9 @@ void buildHuffmanCodebook(int input){
             insertHeap(minHeap, newNode);
         }
     }
-    printf("%d", HeapSize);
-    print2DTreeNode(minHeap[0], 0);
+
+    //printf("%d", HeapSize);
+    //print2DTreeNode(minHeap[0], 0);
     //////////////////////////
     
     remove("./HuffmanCodebook");
@@ -221,66 +220,13 @@ void buildHuffmanCodebook(int input){
     writeString(book, "\n");
     writeCodebook(minHeap[0], book, escapeChar, "");
 
-    /*if(compress + decomp){
-        int codebook = open(argv[3], O_RDONLY);
-        if(codebook < 0) errorPrint("Could not open codebook", 1);
-    }*/
-
     freeAvl(head);
     free(escapeChar);
     freeHuff(minHeap[0]);
     close(book);
 }
 
-int decompressFile(Node* head, int input, int output){
-    
-    if(head == NULL) return -1;
 
-    int bytesRead = 1;
-    char buffer[201];
-
-    //If words aren't complete by the time read returns, we need to carry the word over.
-    Node* ptr = head;
-    int carryOverSize = 0;
-    int escapeCharSize = 1;
-    int i;
-    
-
-
-    do{
-        bytesRead = read(input, buffer, 200);
-        if(bytesRead == -1) return -1;
-        else if (bytesRead == 0) break;
-        buffer[bytesRead] = '\0';
-        for(i = 0; i<bytesRead; i++){
-            switch(buffer[i]){
-                case '0':
-                    ptr = ptr->left;
-                    break;
-                case '1':
-                    ptr = ptr->right;
-                    break;
-                case '\0':
-                    continue;
-                    break;
-                default:
-                    errorPrint("Fatal Error: .hcz file contains invalid characters", 1);
-                    break;
-            }
-
-            if(ptr->left == NULL && ptr->right == NULL){
-                writeString(output, ptr->string);
-                ptr = head;
-            }
-        }
-    } while (bytesRead >0);
-
-    if(ptr != head){ //there was leftover or extra bits, caused by changed encryption, changed codebook, or incorrect codebook
-        printf("Error: Codebook did not line up with encryption. Left over bits were thrown out\n");
-    }
-
-    return 0;
-}
 
 //checks the first 2 flags to see what we're doing and if it's recursive or not
 /*int flagCheck(char* argv[]){
