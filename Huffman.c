@@ -227,7 +227,7 @@ void buildHuffmanCodebook(int input){
 }
 
 
-int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
+/*int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
     if(head == NULL) return -1;
     int bitLength = strlen(bitString);
 
@@ -267,7 +267,7 @@ int writeCodebook(treeNode* head, int fd, char* escapeChar, char* bitString){
                 break;
         }*/
         
-        char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
+/*      char* inputtedToken = booleanIsSpace? escapeCharHandler(escapeChar, head->token) : head->token;
 
         strcat(temp, inputtedToken);
         strcat(temp, "\n");
@@ -369,7 +369,7 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
         *word= '\0';
         char* code = (char*) malloc(sizeof(char));
         *code = '\0';*/
-        while (index <= bytesRead){
+/*      while (index <= bytesRead){
             
             if(buffer[index] == '\t'){
                 codeTemp = (char*) malloc(codeCarryOverSize + (index - startIndex)+1);
