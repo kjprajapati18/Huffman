@@ -74,7 +74,10 @@ void printFiles(DIR* directory, char* basePath){
     rewinddir(directory);
     while((dir = readdir(directory)) != NULL){
         if(dir->d_type == 4){
-            if((dir->d_name[0]) == '.') continue;
+            if((dir->d_name[0]) == '.'){
+                //printf("Directory: %s\n", dir->d_name);
+                continue;
+            }
             strcpy(path, basePath);
             strcat(path, dir->d_name);
             strcat(path, "/");

@@ -19,6 +19,7 @@
 void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar);
 void buildHuffmanCodebook(int input, Node** head, char** escapeChar);
 void exportHuffman(Node* head, char** escapeChar);
+int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar, int flagMode);
 /* TO DO LIST:::::::::::
 
     -Add checks for every malloc                                        (cuz he's reading our code)
@@ -45,7 +46,8 @@ int main(int argc, char* argv[]){
 
     //each flag corresponds to 1 or 0. flagCheck will set the proper flags. If there is an error in the input, flagCheck will display error and exit()
     int bcdFlag = flagCheck(argc, argv);
-
+    
+    //The input is proper in terms of number of arguments and position of each argument. Now try to open the needed items (directory/file/codebook)
     
     Node* head = NULL;      //AVL head. Storing inputs for buildTree
 
@@ -53,42 +55,60 @@ int main(int argc, char* argv[]){
     escapeChar[0] = _ESCAPECHAR;
     escapeChar[1] = '\0';
 
-    //The input is proper in terms of number of arguments and position of each argument. Now try to open the needed items (directory/file/codebook)
-    //We can optimize this later by using +recursive on some arguments
-    if(recursive){
-        DIR* directory = opendir(argv[3]);
-        if(directory == NULL) errorPrint("Could not open directory", 1);
+    int codeBook;
+    if(bcdFlag != _BUILD) codeBook = open(argv[3+recursive], O_RDONLY);
+    else codeBook = -1;
 
+    if(recursive){
+        /*DIR* directory = opendir(argv[3]);
+        if(directory == NULL) errorPrint("Could not open directory", 1);
+        
         printf("Printing Directories:\n\n");
         printf("Files in %s:\n", argv[3]);
-        printFiles(directory, argv[3]);
-        return 0;
+        printFiles(directory, argv[3]);*/
+        
+        recursiveOperation(argv[3], codeBook, &head, &escapeChar, bcdFlag);
+
+    }else {
+        performOperation(bcdFlag, &head, codeBook, argv[2], &escapeChar);
     }
 
-    int codeBook;
-    if(bcdFlag != _BUILD) codeBook = open(argv[3], O_RDONLY);
-    else codeBook = -1;
-    performOperation(bcdFlag, &head, codeBook, argv[2], &escapeChar);
+    if(head !=NULL && bcdFlag == _BUILD){
+        exportHuffman(head, &escapeChar);
+    }
 
-    freeAvl(head);
+    if(head == NULL){
+        printf("Warning: None of the given file(s) can be opened\n");
+    }else{
+        print2DTree(head, 0);
+        //freeAvl(head);
+    }
+    
     free(escapeChar);
     return 0;
 }
 
 
 void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar){
-    int input = open(inputPath, O_RDONLY);
-    if(input < 0) errorPrint("Could not open input file", 1);
     if(mode != _BUILD && codeBook < 0) errorPrint("Could not open codebook file", 1);
-
+    
     int inputPathLength = strlen(inputPath);
+    if(mode == _DECOMPRESS && (inputPathLength < 5 || strcmp(inputPath+inputPathLength-4, ".hcz") != 0)){
+        return; //Its not <name>.hcz, cant decompress. This check is for recursion
+    } else if (mode != _DECOMPRESS && (inputPathLength > 4 && strcmp(inputPath+inputPathLength-4, ".hcz") == 0)){
+        return; //Its .hcz, cant compress or build. This check is for recursion
+    }
+    
+    int input = open(inputPath, O_RDONLY);
+    if(input < 0) return;
+
+
     char* outputName;
 
     switch (mode){
         case _BUILD:
             outputName = malloc(1); //Malloc space because we will free no matter what
             buildHuffmanCodebook(input, headAVL, escapeChar);
-            exportHuffman(*headAVL, escapeChar);
             break;
         case _COMPRESS:
             outputName = (char*) malloc(sizeof(char)*(inputPathLength+5+4));
@@ -97,7 +117,7 @@ void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, 
             strcat(outputName, ".hcz");
 
             *headAVL = codebookAvl(codeBook, insert);
-            //print2DTree(headAVL, 0);
+            print2DTree(*headAVL, 0);
             int outputComp = open(outputName, O_WRONLY | O_CREAT, 00600);
             getInput(headAVL, input, NULL, outputComp, mode);
 
@@ -125,6 +145,49 @@ void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, 
     
     close(input);
     free(outputName);
+}
+
+int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar, int flagMode){
+    DIR* directory = opendir(path);
+    readdir(directory);
+    readdir(directory); //Get rid of the . and .. directories
+    
+    struct dirent* dir;
+    int pathLength = strlen(path);
+    if(path[pathLength-1] == '/'){
+        path[pathLength-1] = '\0';
+        pathLength--;
+    }
+
+
+    while((dir = readdir(directory)) != NULL){
+        if(dir->d_type != DT_DIR && dir->d_type != DT_REG) continue;
+
+        char* newPath = malloc(pathLength + strlen(dir->d_name)+2);
+        *newPath = '\0';
+        strcpy(newPath, path);
+        strcat(newPath, "/");
+        strcat(newPath, dir->d_name);
+        printf("PathName: %s\n", newPath);
+
+        switch (dir->d_type){
+            case DT_DIR:
+                recursiveOperation(newPath, codebook, head, escapeChar, flagMode);
+                break;
+
+            case DT_REG:
+                performOperation(flagMode, head, codebook, newPath, escapeChar);
+                lseek(codebook, 0, SEEK_SET);
+                break;
+            default:
+                break;
+        }
+        free(newPath);
+    }
+
+    closedir(directory);
+    return 0;
+
 }
 
 void buildHuffmanCodebook(int input, Node** headAVL, char** escapeChar){

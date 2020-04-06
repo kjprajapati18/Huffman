@@ -77,7 +77,7 @@ treeNode* merge(treeNode* less, treeNode* great){
 void freeHuff(treeNode* head){
     treeNode* l = head->left;
     treeNode* r = head->right;
-    free(head->token);
+    //free(head->token);
     free(head);
     if(l != NULL) freeHuff(l);
     if(r != NULL) freeHuff(r);
