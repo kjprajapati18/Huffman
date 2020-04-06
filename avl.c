@@ -57,12 +57,14 @@ Node* LR(Node* head){
     return newHead;
 }
 
+//Gets the balance factor of a Node
 int balanceFactor(Node* head){
     return (head == NULL)? 0: height(head->left) - height(head->right);
 }
 
+//Inserts a token if it is not already in the tree, otherwise it just increases the frequency. Double checks balances and rotates if necessary
 Node* insert(Node* node, char* word, char* code){
-    if(word[0] == '\0') return node;
+    if(word[0] == '\0') return node;    //Do not add Empty strings
     if(node == NULL){
         tokens++;
         return makeNode(word, code);
@@ -79,6 +81,7 @@ Node* insert(Node* node, char* word, char* code){
 
     node->height = 1 + max(height(node->left), height(node->right));
     int balance = balanceFactor(node);
+    
     //left right or left left
     if(balance > 1){
         //left left
@@ -92,6 +95,7 @@ Node* insert(Node* node, char* word, char* code){
             return RR(node);
         }
     }
+    
     //right right or right left
     else if(balance < -1){
         //right right
@@ -104,9 +108,11 @@ Node* insert(Node* node, char* word, char* code){
             return LR(node);
         }
     }
+    
     return node;
 }
 
+//Free the AVL tokens, bit strings, and each node, since all of them were malloc'd
 void freeAvl(Node* head){
     Node* l = head->left;
     Node* r = head->right;
@@ -117,6 +123,7 @@ void freeAvl(Node* head){
     if(r != NULL) freeAvl(r);
 }
 
+//Function that prints tree sideways. Used only for testing
 void print2DTree(Node *root, int space) 
 { 
     // Base case 
@@ -144,11 +151,11 @@ void print2DTree(Node *root, int space)
     print2DTree(root->left, space); 
 }
 
-
+//Finds the AVLNode that contains token, and returns it in selectedNode. Returns 0 if successful and negative number otherwise
 int findAVLNode(Node** selectedNode, Node* head, char* token){
     int status = 0;
-    if(token[0] == '\0') return -1;
-    if(head == NULL){
+    if(token[0] == '\0') return -1; //There are no empty strings
+    if(head == NULL){               //Didn't find it
         return -2;
     }
 
@@ -162,6 +169,9 @@ int findAVLNode(Node** selectedNode, Node* head, char* token){
     return status;
 }
 
+//This function recreates the Huffman Tree based on the bitStrings given.
+//If the Node exists, it will simply traverse the tree, otherwise it will create it and continue traversing
+//Example: if the bitstring was 101, then head->right points to node, whose ->left points to a Node, whose ->right points to a Node, which is where it would be on the Huffman Tree
 Node* rebuildHuffman(Node* head, char* token, char* bitString){
     if(head == NULL){
         head = makeNode(token, bitString);

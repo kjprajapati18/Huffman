@@ -2,7 +2,7 @@
 #define MINHEAP_H
 #include "avl.h"
 
-//nodes that are stored in minheap
+//nodes that are stored in minheap. Used to Build Huffman Tree
 typedef struct treeNode{
     int freq;
     char* token;

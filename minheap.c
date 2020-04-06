@@ -3,13 +3,14 @@
 #include <string.h>
 #include "minheap.h"
 
-
+//Swap 2 tree Nodes
 void swap(treeNode** a, treeNode** b){
     treeNode* temp = *a;
     *a = *b;
     *b = temp;
 }
 
+//Turn an unordered array into a heap (algo from data structures)
 void heapify(treeNode* minHeap[], int node){
     
     if (HeapSize == 1){
@@ -41,6 +42,7 @@ void heapify(treeNode* minHeap[], int node){
 
 }
 
+//Puts a treeNode into the array and maintain the heap structure
 void insertHeap(treeNode* minHeap[], treeNode* newNode){
     if(HeapSize == 0){
         minHeap[0] = newNode;
@@ -51,11 +53,12 @@ void insertHeap(treeNode* minHeap[], treeNode* newNode){
         HeapSize+=1;
         int i = HeapSize/2 -1;
         for (i; i >= 0; i--){
-            heapify(minHeap, i);            //PLease SiftUp
+            heapify(minHeap, i);
         }
     }
 }
 
+//Remove an element from the array and maintain heap structure
 treeNode* pop(treeNode* minHeap[]){
     swap(&minHeap[0], &minHeap[HeapSize -1]);
     HeapSize-=1;
@@ -64,6 +67,7 @@ treeNode* pop(treeNode* minHeap[]){
     return minHeap[HeapSize];
 }
 
+//Create a new Node that points to both less and great. This is used when creating a huffman tree, which is when we need to create intermediate trees with summed frequencies
 treeNode* merge(treeNode* less, treeNode* great){
     treeNode* newNode = (treeNode*) malloc(sizeof(treeNode));
     newNode->freq = less->freq + great->freq;
@@ -74,6 +78,7 @@ treeNode* merge(treeNode* less, treeNode* great){
     return newNode;
 }
 
+//Free Everythign in Huffman tree (token and nodes)
 void freeHuff(treeNode* head){
     treeNode* l = head->left;
     treeNode* r = head->right;
@@ -83,6 +88,8 @@ void freeHuff(treeNode* head){
     if(r != NULL) freeHuff(r);
 }
 
+
+//This function is used for testing only. It prints out the huffman tree sideways
 void print2DTreeNode(treeNode *root, int space) 
 { 
     // Base case 
@@ -110,6 +117,8 @@ void print2DTreeNode(treeNode *root, int space)
     print2DTreeNode(root->left, space); 
 }
 
+
+//This function takes the AVL tree and turns each Node into a TreeNode. It then puts every TreeNode into an array
 int fillMinHeapArray(treeNode*minHeap[], Node* root, int count){
     if(root == NULL) return count;
     int size = strlen(root->string) + 1;
