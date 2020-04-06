@@ -16,9 +16,9 @@
 #include "minheap.h"
 #include "codebookWriter.h"
 #include "inputHandler.h"
-void performOperation (int mode, int codeBook, char* inputPath);
-void buildHuffmanCodebook(int input);
-#define _ESCAPECHAR '\\'
+void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar);
+void buildHuffmanCodebook(int input, Node** head, char** escapeChar);
+void exportHuffman(Node* head, char** escapeChar);
 /* TO DO LIST:::::::::::
 
     -Add checks for every malloc                                        (cuz he's reading our code)
@@ -39,13 +39,19 @@ void buildHuffmanCodebook(int input);
 
 int main(int argc, char* argv[]){
     tokens = 0, recursive = 0;
-    Node* head = NULL;      //AVL head. Storing inputs for buildTree
 
     //Check for valid inputs
     if(argc < 3) errorPrint("Fatal Error: Not enough arguments", 1);
 
     //each flag corresponds to 1 or 0. flagCheck will set the proper flags. If there is an error in the input, flagCheck will display error and exit()
     int bcdFlag = flagCheck(argc, argv);
+
+    
+    Node* head = NULL;      //AVL head. Storing inputs for buildTree
+
+    char* escapeChar = (char*) malloc(sizeof(char)*2);
+    escapeChar[0] = _ESCAPECHAR;
+    escapeChar[1] = '\0';
 
     //The input is proper in terms of number of arguments and position of each argument. Now try to open the needed items (directory/file/codebook)
     //We can optimize this later by using +recursive on some arguments
@@ -62,42 +68,44 @@ int main(int argc, char* argv[]){
     int codeBook;
     if(bcdFlag != _BUILD) codeBook = open(argv[3], O_RDONLY);
     else codeBook = -1;
-    performOperation(bcdFlag, codeBook, argv[2]);
+    performOperation(bcdFlag, &head, codeBook, argv[2], &escapeChar);
 
+    freeAvl(head);
+    free(escapeChar);
     return 0;
 }
 
 
-void performOperation (int mode, int codeBook, char* inputPath){
+void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar){
     int input = open(inputPath, O_RDONLY);
     if(input < 0) errorPrint("Could not open input file", 1);
     if(mode != _BUILD && codeBook < 0) errorPrint("Could not open codebook file", 1);
 
     int inputPathLength = strlen(inputPath);
     char* outputName;
-    Node* headAVL;
 
     switch (mode){
         case _BUILD:
             outputName = malloc(1); //Malloc space because we will free no matter what
-            buildHuffmanCodebook(input);
+            buildHuffmanCodebook(input, headAVL, escapeChar);
+            exportHuffman(*headAVL, escapeChar);
             break;
         case _COMPRESS:
             outputName = (char*) malloc(sizeof(char)*(inputPathLength+5+4));
             outputName[0] = '\0';
             strcpy(outputName, inputPath);
-            strcat(outputName, "test.hcz");
+            strcat(outputName, ".hcz");
 
-            headAVL = codebookAvl(codeBook, insert);
+            *headAVL = codebookAvl(codeBook, insert);
             //print2DTree(headAVL, 0);
             int outputComp = open(outputName, O_WRONLY | O_CREAT, 00600);
-            getInput(&headAVL, input, NULL, outputComp, mode);
+            getInput(headAVL, input, NULL, outputComp, mode);
 
             close(outputComp);
-            free(headAVL);
+            free(*headAVL);
             break;
         case _DECOMPRESS:
-            headAVL = codebookAvl(codeBook, rebuildHuffman); 
+            *headAVL = codebookAvl(codeBook, rebuildHuffman); 
             // String manipulation to figure out output filename here
             outputName = (char*) malloc(sizeof(char)*(inputPathLength+5));
             outputName[0] = '\0';
@@ -108,10 +116,10 @@ void performOperation (int mode, int codeBook, char* inputPath){
             int outputDecomp = open(outputName, O_WRONLY | O_CREAT, 00600);
             //if(*(headAVL->string) == ' ') printf("\n\nYEA\n\n", headAVL->string);
             //print2DTree(headAVL, 0);
-            decompressFile(headAVL, input, outputDecomp);
+            decompressFile(*headAVL, input, outputDecomp);
             // close and free
             close(outputDecomp);
-            free(headAVL);
+            free(*headAVL);
             break;
         default:
             break;
@@ -121,17 +129,21 @@ void performOperation (int mode, int codeBook, char* inputPath){
     free(outputName);
 }
 
-void buildHuffmanCodebook(int input){
-    Node* head= NULL;
+void buildHuffmanCodebook(int input, Node** headAVL, char** escapeChar){
+    Node* head= *headAVL;
 
-    char* escapeChar = (char*) malloc(sizeof(char)*2);
-    escapeChar[0] = _ESCAPECHAR;
-    escapeChar[1] = '\0';
+    // char* escapeChar = (char*) malloc(sizeof(char)*2);
+    // escapeChar[0] = _ESCAPECHAR;
+    // escapeChar[1] = '\0';
 
     int inputCheck; 
-    inputCheck = getInput(&head, input, &escapeChar, 0, _BUILD);
+    inputCheck = getInput(&head, input, escapeChar, 0, _BUILD);
     if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //expand to different errors, but also make a different function to handle the differnt error
     
+    *headAVL = head;
+}
+
+void exportHuffman(Node* head, char** escapeChar){
 
     //Put build huffman here
     HeapSize = tokens;
@@ -164,12 +176,12 @@ void buildHuffmanCodebook(int input){
     
     remove("./HuffmanCodebook");
     int book = open("./HuffmanCodebook", O_WRONLY | O_CREAT, 00400);
-    writeString(book, escapeChar);
+    writeString(book, *escapeChar);
     writeString(book, "\n");
-    writeCodebook(minHeap[0], book, escapeChar, "");
+    writeCodebook(minHeap[0], book, *escapeChar, "");
 
     //freeAvl(head);
     //free(escapeChar);             /////// PUT THESE BACK
-    //freeHuff(minHeap[0]);
+    freeHuff(minHeap[0]);
     close(book);
 }
