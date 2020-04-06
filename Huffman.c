@@ -238,7 +238,7 @@ void buildHuffmanCodebook(int input, Node** headAVL, char** escapeChar){
     int inputCheck; 
     inputCheck = getInput(&head, input, escapeChar, 0, _BUILD);         //This function reads the file && fills AVL with token/frequencies
     if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //inputCheck will return non-0 value if something goes wrong
-    
+    print2DTree(head, 0);
     *headAVL = head;        //Return head by changing double pointer
 }
 
@@ -269,6 +269,7 @@ void exportHuffman(Node* head, char** escapeChar){
         }
     }
     //The minheap now has only 1 Node inside it, which is the Huffman Tree
+    print2DTreeNode(minHeap[0], 0);
 
     //Remove old book to prevent overwrite issues. Create new book and write the HuffmanCodebook using 
     remove("./HuffmanCodebook"); //Will not crash program if the file does not exist

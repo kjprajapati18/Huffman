@@ -70,7 +70,7 @@ treeNode* pop(treeNode* minHeap[]){
 //Create a new Node that points to both less and great. This is used when creating a huffman tree, which is when we need to create intermediate trees with summed frequencies
 treeNode* merge(treeNode* less, treeNode* great){
     treeNode* newNode = (treeNode*) malloc(sizeof(treeNode));
-    newNode->freq = less->freq + great->freq;
+    if(less != NULL && great != NULL)newNode->freq = less->freq + great->freq;
     newNode->token = (char*) malloc(sizeof(char));
     *(newNode->token) = '\0';
     newNode->left = less;
