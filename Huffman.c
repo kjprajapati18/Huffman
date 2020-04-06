@@ -13,7 +13,7 @@
 #include "minheap.h"
 #include "codebookWriter.h"
 #include "inputHandler.h"
-void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar);
+int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar);
 void buildHuffmanCodebook(int input, Node** head, char** escapeChar);
 void exportHuffman(Node* head, char** escapeChar);
 int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar, int flagMode);
@@ -66,6 +66,8 @@ int main(int argc, char* argv[]){
     escapeChar[0] = _ESCAPECHAR;
     escapeChar[1] = '\0';
 
+    int count = 0;
+
     int codeBook;
     if(bcdFlag != _BUILD) codeBook = open(argv[3+recursive], O_RDONLY);
     else codeBook = -1;
@@ -78,19 +80,20 @@ int main(int argc, char* argv[]){
         printf("Files in %s:\n", argv[3]);
         printFiles(directory, argv[3]);*/
         
-        recursiveOperation(argv[3], codeBook, &head, &escapeChar, bcdFlag);
+        count = recursiveOperation(argv[3], codeBook, &head, &escapeChar, bcdFlag);
 
     }else {
-        performOperation(bcdFlag, &head, codeBook, argv[2], &escapeChar);
+        count = performOperation(bcdFlag, &head, codeBook, argv[2], &escapeChar);
     }
 
     if(head !=NULL && bcdFlag == _BUILD){
         exportHuffman(head, &escapeChar);
     }
 
-    if(head == NULL){
+    if(!count){
         printf("Warning: None of the given file(s) can be opened\n");
-    }else{
+    }
+    if(bcdFlag == _BUILD){
         //print2DTree(head, 0);
         freeAvl(head);
     }
@@ -100,18 +103,18 @@ int main(int argc, char* argv[]){
 }
 
 
-void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar){
+int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar){
     if(mode != _BUILD && codeBook < 0) errorPrint("Could not open codebook file", 1);
     
     int inputPathLength = strlen(inputPath);
     if(mode == _DECOMPRESS && (inputPathLength < 5 || strcmp(inputPath+inputPathLength-4, ".hcz") != 0)){
-        return; //Its not <name>.hcz, cant decompress. This check is for recursion
+        return 0; //Its not <name>.hcz, cant decompress. This check is for recursion
     } else if (mode != _DECOMPRESS && (inputPathLength > 4 && strcmp(inputPath+inputPathLength-4, ".hcz") == 0)){
-        return; //Its .hcz, cant compress or build. This check is for recursion
+        return 0; //Its .hcz, cant compress or build. This check is for recursion
     }
     
     int input = open(inputPath, O_RDONLY);
-    if(input < 0) return;
+    if(input < 0) return 0;
 
 
     char* outputName;
@@ -164,9 +167,11 @@ void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, 
     }
     close(input);
     free(outputName);
+    return 1;
 }
 
 int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar, int flagMode){
+    int count = 0;
     DIR* directory = opendir(path);
     readdir(directory);
     readdir(directory); //Get rid of the . and .. directories
@@ -191,11 +196,11 @@ int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar,
 
         switch (dir->d_type){
             case DT_DIR:
-                recursiveOperation(newPath, codebook, head, escapeChar, flagMode);
+                count+=recursiveOperation(newPath, codebook, head, escapeChar, flagMode);
                 break;
 
             case DT_REG:
-                performOperation(flagMode, head, codebook, newPath, escapeChar);
+                count+=performOperation(flagMode, head, codebook, newPath, escapeChar);
                 lseek(codebook, 0, SEEK_SET);
                 break;
             default:
@@ -205,7 +210,7 @@ int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar,
     }
 
     closedir(directory);
-    return 0;
+    return count;
 
 }
 

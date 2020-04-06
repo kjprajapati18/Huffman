@@ -1,5 +1,5 @@
 all: Huffman.c avl.o minheap.o codebookWriter.o inputHandler.o
-	gcc -o fileCompressor Huffman.c avl.o minheap.o codebookWriter.o inputHandler.o 
+	gcc -g -o fileCompressor Huffman.c avl.o minheap.o codebookWriter.o inputHandler.o 
 
 buildTest: Huffman.c avl.o minheap.o codebookWriter.o inputHandler.o test.txt
 	make clean
