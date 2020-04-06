@@ -1,6 +1,3 @@
-//TODO list:
-//heap: insert method, remove method, array of treenode*
-//tree: tree nodes: treeNodes
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +33,20 @@ int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar,
     QUESTIONS?
     -compress/decompress with blank codebook what do?
     -
+
+    FINAL TO DO LIST
+    - fix output name for decomp
+    - test case for empty file empty directory (i say warning and do it anyway)
+    - free everything during errors
+        1. working case it frees everyting
+        2. every errro case it frees everything
+    - comment code and remove random nonsesnse
+    - specify recusrions will recurse on huffmancodebook file in read me 
+    - fix order of recursion flag ?? maybe i think a warning if fligpped
+    - check codebook format
+    - if recursivve call but file instead of path, do command on file and then output normally with warning. specify this in read me
+    - sift up (efficeincy)
+
 */
 
 int main(int argc, char* argv[]){
