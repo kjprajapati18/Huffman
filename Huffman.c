@@ -14,7 +14,7 @@
 #include "codebookWriter.h"
 #include "inputHandler.h"
 int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, char** escapeChar);  //Will decide whether to build, compress, or decomp based on flag
-void buildHuffmanCodebook(int input, Node** head, char** escapeChar);                               //Will add to AVL tree based on input files
+int buildHuffmanCodebook(int input, Node** head, char** escapeChar);                               //Will add to AVL tree based on input files
 void exportHuffman(Node* head, char** escapeChar);                                                  //Will output HuffmanCodebook based on built AVL
 int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar, int flagMode);     //Will call performOperation on every file in directory and recurse on every directory
 /* TO DO LIST:::::::::::
@@ -35,11 +35,9 @@ int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar,
     -
 
     FINAL TO DO LIST
-    -fix one token error
     - fix output name for decomp (uncomment it)
     - free everything during errors
         2. every errro case it frees everything
-    - comment code and remove random nonsesnse
     - specify recusrions will recurse on huffmancodebook file in read me 
     - if recursivve call but file instead of path, do command on file and then output normally with warning. specify this in read me
     - sift up (efficeincy)
@@ -57,6 +55,12 @@ int main(int argc, char* argv[]){
     //each flag corresponds to 1 or 0. flagCheck will set the proper flags. If there is an error in the input, flagCheck will display error and exit()
     int bcdFlag = flagCheck(argc, argv);
     
+    if(!recursive){
+        int test = open(argv[2], O_RDONLY);
+        if(test < 0) errorPrint("Fatal Error: Could not open file (does it exist?)", 1);
+        close(test);
+    }
+
     //
     //The input is proper in terms of number of arguments and position of each argument. Now try to open the needed items (directory/file/codebook)
     //
@@ -76,8 +80,22 @@ int main(int argc, char* argv[]){
 
     if(recursive){
         count = recursiveOperation(argv[3], codeBook, &head, &escapeChar, bcdFlag); //Recursive operation returns the number of files operated on
+        if(count == -3){
+            free(escapeChar);
+            if(codeBook > 0) close(codeBook);
+            errorPrint("Fatal Error: Could not open directory (does it exist?)", 1);
+        }
     }else {
         count = performOperation(bcdFlag, &head, codeBook, argv[2], &escapeChar);   //Returns the number of files operated on
+    }
+
+    //On error, exit and return 1;
+    if(count == -1){
+        printf("\nExiting due to error\n");
+        if(codeBook > 0) close(codeBook);
+        free(escapeChar);
+        if(head != NULL) free(head);
+        return 1;
     }
 
     //If head is not null, there is something in AVL, therefore we can make a codebook as normal.
@@ -103,6 +121,7 @@ int main(int argc, char* argv[]){
 
     //Free and return, we are done
     free(escapeChar);
+    if(codeBook > 0) close(codeBook);
     return 0;
 }
 
@@ -111,7 +130,10 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
     //Check to make sure that the inputs are valid, i.e. proper codebook if comp/decomp, dont compress .hcz, dont decompress .hcz
     //If codebook is invalid and we wanna comp/decomp, we cant do anything. Print fatal error and quit
     //Otherwise, we will continue since there may be other files that can have the operation performed on
-    if(mode != _BUILD && codeBook < 0) errorPrint("Could not open codebook file", 1);
+    if(mode != _BUILD && codeBook < 0){
+        printf("Fatal Error: Could not open codebook file\n");
+        return -1;
+    }
     
     int inputPathLength = strlen(inputPath);
     if(mode == _DECOMPRESS && (inputPathLength < 5 || strcmp(inputPath+inputPathLength-4, ".hcz") != 0)){
@@ -124,6 +146,7 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
     int input = open(inputPath, O_RDONLY);
     if(input < 0) return 0;
 
+    int inputCheck = 0; 
 
     //Create an outputName that we will determine based on path & what mode we're in
     char* outputName;
@@ -131,7 +154,7 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
     switch (mode){
         case _BUILD:
             outputName = malloc(1);                             //Malloc space because we will free no matter what
-            buildHuffmanCodebook(input, headAVL, escapeChar);   //Will fill AVL tree and escapeChar based on input
+            inputCheck = buildHuffmanCodebook(input, headAVL, escapeChar);   //Will fill AVL tree and escapeChar based on input
             break;
         case _COMPRESS:
             outputName = (char*) malloc(sizeof(char)*(inputPathLength+5+4));        //Adjust the name by appending .hcz
@@ -142,8 +165,9 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
             *headAVL = codebookAvl(codeBook, insert);                               //build AVL tree (sorted by token) based on codebook given
             
             int outputComp = open(outputName, O_WRONLY | O_CREAT, 00600);
-            getInput(headAVL, input, NULL, outputComp, mode);                       //Write out the compressed bitstring to outputPath
+            inputCheck = getInput(headAVL, input, NULL, outputComp, mode);                       //Write out the compressed bitstring to outputPath
             close(outputComp);
+            if(inputCheck != 0) remove(outputName);
             break;
         case _DECOMPRESS:
             *headAVL = codebookAvl(codeBook, rebuildHuffman);                       //Rebuild HuffmanTree using codebook
@@ -160,10 +184,10 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
 
             
             int outputDecomp = open(outputName, O_WRONLY | O_CREAT, 00600);         
-            decompressFile(*headAVL, input, outputDecomp);                          //Write decompressed strings to output
-            
+            inputCheck = decompressFile(*headAVL, input, outputDecomp);                          //Write decompressed strings to output
             // close and free
             close(outputDecomp);
+            if(inputCheck == -1 || inputCheck == -3 || inputCheck == -4) remove(outputName);    //These are fatal errors in decompress
             break;
         default:
             break;
@@ -172,18 +196,22 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
     //Free AVL stuff if we are not in build, because we do not need it anymore
     if(mode == _COMPRESS || mode== _DECOMPRESS){
         if(headAVL != NULL && *headAVL!= NULL) freeAvl(*headAVL);
-            *headAVL = NULL;
+        *headAVL = NULL;
     }
+
     close(input);
     free(outputName);
-
+    if(inputCheck != 0) return -1;
     //We have succesfully performed 1 operation
     return 1;
 }
 
 int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar, int flagMode){
-    int count = 0;
+    int count = 0, check = 0;;
     DIR* directory = opendir(path);
+    if(directory == NULL){
+        return -3;
+    }
     readdir(directory);
     readdir(directory); //Get rid of the . and .. directories
     
@@ -209,17 +237,26 @@ int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar,
 
         //If it is a directory, perform the same operations on everything inside the directory
         //If it is a file, perform the operation on the file
+        //On error, close everythign and return -1
         switch (dir->d_type){
             case DT_DIR:
-                count+=recursiveOperation(newPath, codebook, head, escapeChar, flagMode);
+                check=recursiveOperation(newPath, codebook, head, escapeChar, flagMode);
                 break;
 
             case DT_REG:
-                count+=performOperation(flagMode, head, codebook, newPath, escapeChar);
+                check=performOperation(flagMode, head, codebook, newPath, escapeChar);
                 lseek(codebook, 0, SEEK_SET);
                 break;
             default:
                 break;
+        }
+        
+        if(check == -1){
+            free(newPath);
+            closedir(directory);
+            return -1;
+        } else {
+            count += check;
         }
 
         free(newPath); //We are done with this path and we will malloc another new path in the next iteration
@@ -232,14 +269,19 @@ int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar,
 
 }
 
-void buildHuffmanCodebook(int input, Node** headAVL, char** escapeChar){
+int buildHuffmanCodebook(int input, Node** headAVL, char** escapeChar){
     Node* head= *headAVL;
 
     int inputCheck; 
     inputCheck = getInput(&head, input, escapeChar, 0, _BUILD);         //This function reads the file && fills AVL with token/frequencies
-    if(inputCheck != 0) errorPrint("FATAL ERROR: Could not fully finish tree", 1); //inputCheck will return non-0 value if something goes wrong
-    print2DTree(head, 0);
+    
     *headAVL = head;        //Return head by changing double pointer
+
+    if(inputCheck != 0){
+        printf("FATAL ERROR: Could not fully finish tree\n");  //inputCheck will return non-0 value if something goes wrong
+        return -1;
+    }
+    return 0;
 }
 
 void exportHuffman(Node* head, char** escapeChar){
@@ -269,7 +311,6 @@ void exportHuffman(Node* head, char** escapeChar){
         }
     }
     //The minheap now has only 1 Node inside it, which is the Huffman Tree
-    print2DTreeNode(minHeap[0], 0);
 
     //Remove old book to prevent overwrite issues. Create new book and write the HuffmanCodebook using 
     remove("./HuffmanCodebook"); //Will not crash program if the file does not exist

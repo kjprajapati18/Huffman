@@ -105,6 +105,7 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
 
     Node* list = *head;
     int bytesRead = 1;
+    int readHandlerCheck = 0;
     int size = 0;
     char buffer[201];
     int i = 0;
@@ -121,7 +122,10 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
     do{
         //Read 200 bytes. If 0, then we've reached EOF. If -1 something is wrong so return
         bytesRead = read(inputFd, buffer, 200);
-        if(bytesRead == -1) return -1;
+        if(bytesRead == -1){
+            printf("Fatal Error: read could not read file\n");
+            return -1;
+        }
         else if (bytesRead == 0) break;
         buffer[bytesRead] = '\0';               //Set end to \0
 
@@ -143,15 +147,26 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
                     free(carryOver);
                     carryOver = temp;
 
-                    readHandler(&list, carryOver, carryOverSize, escapeChar, &escapeCharSize, outputFd, mode);
+                    readHandlerCheck = readHandler(&list, carryOver, carryOverSize, escapeChar, &escapeCharSize, outputFd, mode);
                     carryOverSize = 0;
                 } else {
-                    readHandler(&list, buffer+startIndex, i-startIndex, escapeChar, &escapeCharSize, outputFd, mode);
+                    readHandlerCheck = readHandler(&list, buffer+startIndex, i-startIndex, escapeChar, &escapeCharSize, outputFd, mode);
                 }
 
                 //After sending to read handler, we know that the next word would be at index+1
 	            startIndex = i+1;
-                readHandler(&list, delimiter, 1, escapeChar, &escapeCharSize, outputFd, mode); //Finally, add the space that caused us to enter this point
+                //Always check the handler
+                if(readHandlerCheck != 0){
+                    free(carryOver);
+                    *head = list;
+                    return -1;
+                }
+                readHandlerCheck = readHandler(&list, delimiter, 1, escapeChar, &escapeCharSize, outputFd, mode); //Finally, add the space that caused us to enter this point
+                if(readHandlerCheck != 0){
+                    free(carryOver);
+                    *head = list;
+                    return -1;
+                }
             }
         }
 
@@ -178,12 +193,13 @@ int getInput(Node** head, int inputFd, char** escapeChar, int outputFd, int mode
     
     //if we finished reading a file, but we didn't handle the last token because it didn't end in a space, then we should handle it now
     if(carryOverSize !=0){
-        readHandler(&list, carryOver, carryOverSize, escapeChar, &escapeCharSize, outputFd, mode);
+        readHandlerCheck = readHandler(&list, carryOver, carryOverSize, escapeChar, &escapeCharSize, outputFd, mode);
     }
 
     //Free, and set returns
     free(carryOver);
     *head =list;
+    if(readHandlerCheck != 0) return -1;
     return 0;
 }
 
@@ -211,14 +227,18 @@ int incEscapeChar(char** escapeChar, int* escapeCharSize){
 //_BUILD -> function will increment the escapeChar if necessary and then insert the token into AVL
 //_COMPRESS -> function will attempt to find the token in the AVL created from the codebook. If it is found, it will write it to the output file
 //              Otherwise, it will end the program and say which token was not found
-//OTHER ->  This should never occur because of flagCheck, however, the program will simply terminate here
+//OTHER ->  This will never occur because of flagCheck
 int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int* escapeCharSize, int outputFd, int mode){
     Node* selectedNode;
     int found;
     switch(mode){
         case _BUILD:   
             if(tokenSize == (*escapeCharSize)+1 && strncmp(token, *escapeChar, *escapeCharSize)==0){
-                incEscapeChar(escapeChar, escapeCharSize);          //MALLOC CHECK HERE///////////////////////////////////////////////////////////////////////////////
+                int mallocCheck = incEscapeChar(escapeChar, escapeCharSize);
+                if (mallocCheck != 0){
+                    printf("Fatal Error: Not enough memory to perform the operation on this file\n");
+                    return -1;
+                }
             }
             *head = insert(*head, token, "\0");
             break;
@@ -228,16 +248,13 @@ int readHandler(Node** head, char* token, int tokenSize, char** escapeChar, int*
             found = findAVLNode(&selectedNode, *head, token);
             if(found != 0){
                 printf("Fatal Error: No huffman code exists for a token: %s\n", token);
-                exit(1);
+                return -1;
             }
             writeString(outputFd, selectedNode->codeString);
             break;
-        
-        case _DECOMPRESS:
         default:
-            errorPrint("Fatal Error: Bad flag...", 1);
             break;
-        }
+    }
     return 0;
 }
 
@@ -402,10 +419,12 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
 }
 
 //Read a compressed file and use the HuffmanTree to decode it
-//Returns -1 on error and 0 on success
+//Returns negative number on on error and 0 on success
 int decompressFile(Node* head, int input, int output){
     
-    if(head == NULL) return -1;
+    if(head == NULL){
+        return -2;
+    }
 
     int bytesRead = 1;
     char buffer[201];
@@ -419,7 +438,10 @@ int decompressFile(Node* head, int input, int output){
     //Read the buffer.
     do{
         bytesRead = read(input, buffer, 200);
-        if(bytesRead == -1) return -1;
+        if(bytesRead == -1){
+            printf("Fatal Error: read could not read file");
+            return -3;
+        }
         else if (bytesRead == 0) break;
         buffer[bytesRead] = '\0';
         for(i = 0; i<bytesRead; i++){
@@ -434,7 +456,8 @@ int decompressFile(Node* head, int input, int output){
                 case '\0':
                     break;
                 default:
-                    errorPrint("Fatal Error: .hcz file contains invalid characters", 1);
+                    printf("Fatal Error: .hcz file contains invalid characters\n");
+                    return -4;
                     break;
             }
             
@@ -446,8 +469,9 @@ int decompressFile(Node* head, int input, int output){
         }
     } while (bytesRead >0);
 
-    if(ptr != head){ //there was leftover or extra bits, caused by changed encryption, changed codebook, or incorrect codebook. Print error
-        printf("Error: Codebook did not line up with encryption. Left over bits were thrown out\n");
+    if(ptr != head){ //there was leftover or extra bits, caused by changed encryption, changed codebook, or incorrect codebook. Print fatal error
+        printf("Fatal Error: Codebook did not line up with encryption. Removing output file.\n");
+        return -1;
     }
 
     return 0;
