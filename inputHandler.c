@@ -356,6 +356,9 @@ Node* codebookAvl(int bookfd, Node* (*treeInsert)(Node*, char*, char*)){
             index++;
         }
     }while(bytesRead > 0);
+    free(word);
+    free(code);
+    free(escapeChar);
     return head;
 }
 

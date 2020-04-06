@@ -19,6 +19,26 @@ codebookWriter.o: codebookWriter.c
 inputHandler.o: inputHandler.c
 	gcc -c inputHandler.c
 
+recurseTest: fileCompressor
+	./fileCompressor -R -b test2
+	./fileCompressor -R -c test2 HuffmanCodebook
+	./fileCompressor -R -d test2 HuffmanCodebook
+	diff test2/test4.txt test2/test4.txt.hcz.txt
+	diff test2/test5.txt test2/test5.txt.hcz.txt
+	diff test2/test10/test.txt test2/test10/test.txt.hcz.txt
+	diff test2/test10/test2.txt test2/test10/test2.txt.hcz.txt
+
+cleanText: fileCompressor
+	rm test2/test4.txt.hcz*
+	rm test2/test5.txt.hcz*
+	rm test2/test10/test.txt.hcz*
+	rm test2/test10/test2.txt.hcz*
+
+memcheck: fileCompressor
+	valgrind --leak-check=full ./fileCompressor -R -b test2
+	valgrind --leak-check=full ./fileCompressor -R -c test2 HuffmanCodebook
+	valgrind --leak-check=full ./fileCompressor -R -d test2	HuffmanCodebook
+
 fileCompressor:
 	make all
 

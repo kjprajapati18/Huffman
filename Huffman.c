@@ -131,7 +131,6 @@ void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, 
             //print2DTree(*headAVL, 0);
             int outputComp = open(outputName, O_WRONLY | O_CREAT, 00600);
             getInput(headAVL, input, NULL, outputComp, mode);
-
             close(outputComp);
             break;
         case _DECOMPRESS:
@@ -153,12 +152,16 @@ void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, 
             //print2DTree(headAVL, 0);
             decompressFile(*headAVL, input, outputDecomp);
             // close and free
+           
             close(outputDecomp);
             break;
         default:
             break;
     }
-    
+    if(mode == _COMPRESS || mode== _DECOMPRESS){
+        if(headAVL != NULL && *headAVL!= NULL) freeAvl(*headAVL);
+            *headAVL = NULL;
+    }
     close(input);
     free(outputName);
 }
