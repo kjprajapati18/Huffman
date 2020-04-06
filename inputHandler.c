@@ -11,7 +11,11 @@
 int flagCheck(int argc, char* argv[]){
     int pos;
     int bcdFlag = 0;
-    for(pos = 1; pos < 3; pos++){       //there can only be at most 2 flags and they must be the first 2 args
+    if(strlen(argv[1]) > 2){
+        errorPrint("First flag must be either -R -b -c or -d", 1);
+    }
+    for(pos = 1; pos < 3; pos++){  
+        if(pos == 2 && strlen(argv[2]) > 2) continue;     //there can only be at most 2 flags and they must be the first 2 args
         if(*argv[pos] == '-'){          //Check if its a flag
             switch (*(argv[pos]+1)){    //Check which flag and set appropriate variable
                 case 'b':
@@ -34,7 +38,6 @@ int flagCheck(int argc, char* argv[]){
         } else break;
     }
 
-    
     //If the user did not pick build, compress, or decompress, or they picked too many. The user may have also not put flags as the first argument
     if(bcdFlag != _BUILD && bcdFlag != _COMPRESS && bcdFlag != _DECOMPRESS) errorPrint("Fatal Error: Invalid flag usage. Make sure to pick exactly 1 flag from the following, and that it comes before any arguments: (-b)uild, (-c)ompress, (-d)ecompress", 1);
     

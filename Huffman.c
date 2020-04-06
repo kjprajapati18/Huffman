@@ -35,15 +35,12 @@ int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar,
     -
 
     FINAL TO DO LIST
-    - fix output name for decomp
-    - test case for empty file empty directory (i say warning and do it anyway)
+    -fix one token error
+    - fix output name for decomp (uncomment it)
     - free everything during errors
-        1. working case it frees everyting
         2. every errro case it frees everything
     - comment code and remove random nonsesnse
     - specify recusrions will recurse on huffmancodebook file in read me 
-    - fix order of recursion flag ?? maybe i think a warning if fligpped
-    - check codebook format
     - if recursivve call but file instead of path, do command on file and then output normally with warning. specify this in read me
     - sift up (efficeincy)
 
@@ -88,16 +85,21 @@ int main(int argc, char* argv[]){
 
     if(head !=NULL && bcdFlag == _BUILD){
         exportHuffman(head, &escapeChar);
-    }
-
-    if(!count){
-        printf("Warning: None of the given file(s) can be opened\n");
-    }
-    if(bcdFlag == _BUILD){
-        //print2DTree(head, 0);
         freeAvl(head);
     }
-    
+    if(head == NULL && bcdFlag == _BUILD){
+        remove("HuffmanCodebook");
+        int output = open("HuffmanCodebook", O_WRONLY | O_CREAT, 00400);
+        writeString(output, escapeChar);
+        writeString(output, "\n");
+        close(output);
+        printf("Warning: only empty file(s)/directories detected. Empty codebook created with default escape character (\\)\n");
+    }
+
+    else if(!count){
+        printf("Warning: None of the given file(s) can be compressed or decompressed. Either they don't exist, they cannot be opened, or they are blank.\n");
+    }
+
     free(escapeChar);
     return 0;
 }
