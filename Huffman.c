@@ -102,7 +102,6 @@ void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, 
             getInput(headAVL, input, NULL, outputComp, mode);
 
             close(outputComp);
-            free(*headAVL);
             break;
         case _DECOMPRESS:
             *headAVL = codebookAvl(codeBook, rebuildHuffman); 
@@ -119,7 +118,6 @@ void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, 
             decompressFile(*headAVL, input, outputDecomp);
             // close and free
             close(outputDecomp);
-            free(*headAVL);
             break;
         default:
             break;
