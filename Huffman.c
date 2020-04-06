@@ -80,8 +80,8 @@ int main(int argc, char* argv[]){
     if(head == NULL){
         printf("Warning: None of the given file(s) can be opened\n");
     }else{
-        print2DTree(head, 0);
-        //freeAvl(head);
+        //print2DTree(head, 0);
+        freeAvl(head);
     }
     
     free(escapeChar);
@@ -117,7 +117,7 @@ void performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, 
             strcat(outputName, ".hcz");
 
             *headAVL = codebookAvl(codeBook, insert);
-            print2DTree(*headAVL, 0);
+            //print2DTree(*headAVL, 0);
             int outputComp = open(outputName, O_WRONLY | O_CREAT, 00600);
             getInput(headAVL, input, NULL, outputComp, mode);
 
