@@ -19,19 +19,15 @@ int flagCheck(int argc, char* argv[]){
         if(*argv[pos] == '-'){          //Check if its a flag
             switch (*(argv[pos]+1)){    //Check which flag and set appropriate variable
                 case 'b':
-                    printf("Using Build Huffman Codebook Flag\n");
                     bcdFlag |= _BUILD;
                     break;
                 case 'c':
-                    printf("Using Compression Flag\n");
                     bcdFlag |= _COMPRESS;
                     break;
                 case 'd':
-                    printf("Using the Decompression Flag\n");
                     bcdFlag |= _DECOMPRESS;
                     break;
                 case 'R':
-                    printf("Using the Recursion Flag\n");
                     recursive = 1;
                     break;
             }

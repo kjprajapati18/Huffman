@@ -19,25 +19,8 @@ void exportHuffman(Node* head, char** escapeChar);                              
 int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar, int flagMode);     //Will call performOperation on every file in directory and recurse on every directory
 /* TO DO LIST:::::::::::
 
-    -Add checks for every malloc                                        (cuz he's reading our code)
-    -Make insert on AVL tree return an int and use double pointer       (I think that's convention)
-    -Rename LR and RR to leftRotation and rightRotation                 (for clarity)
-    
-    -Rename heapify to siftDown
-    -Write siftUp
-    -Create insert with siftUp
-    -Pop with siftDown
-
-    -Split buildhuffman into buildhuffman and build avl
-
-    QUESTIONS?
-    -compress/decompress with blank codebook what do?
-    -
-
     FINAL TO DO LIST
     - fix output name for decomp (uncomment it)
-    - free everything during errors
-        2. every errro case it frees everything
     - specify recusrions will recurse on huffmancodebook file in read me 
     - if recursivve call but file instead of path, do command on file and then output normally with warning. specify this in read me
     - sift up (efficeincy)
@@ -91,7 +74,6 @@ int main(int argc, char* argv[]){
 
     //On error, exit and return 1;
     if(count == -1){
-        printf("\nExiting due to error\n");
         if(codeBook > 0) close(codeBook);
         free(escapeChar);
         if(head != NULL) free(head);
