@@ -18,7 +18,7 @@ Test2: Directory with multiple files, and subdirectories
     We tested this as a test of the recursion flag. We made sure all the outputs came into the same folder that they were supposed to be created in (not the given path but possibly the subdirectories in the path). We also tested all the resulting files to make sure the decompressed and original were the same. 
 
 Test3: Large files in a directory recursively
-    We tested this to make sure the program was not running inefficiently. We chose to run all the commands on files of greater than 3 MB and they all ran in adequate time (no step longer than a minute and a half for 10MB file). This was to test the efficiency of our code and guarantee that our data structures are doing as intended.
+    We tested this to make sure the program was not running inefficiently. We chose to run all the commands on files of greater than 3 MB (consisting of either large tokens or numerous smaller tokens) and they all ran in adequate time. This was to test the efficiency of our code and guarantee that our data structures are performing as intended.
 
 Test4: empty file
     We tested this to make sure the program did not crash on empty files and instead outputted a proper warning to the user. It then compresses the empty file to nothing and decompresses it back to nothing. The codebook is just an escape character.
