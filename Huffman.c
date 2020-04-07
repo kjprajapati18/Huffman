@@ -153,16 +153,11 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
             break;
         case _DECOMPRESS:
             *headAVL = codebookAvl(codeBook, rebuildHuffman);                       //Rebuild HuffmanTree using codebook
-            //CORRECT OUTPUT NAME JUST NEED TO IMPLEMENT
-            /*char *outputTest = (char*) malloc(inputPathLength - 4);               //Remove the .hcz extention
+        
+            // String manipulation to figure out output filename here
+            char *outputTest = (char*) malloc(inputPathLength - 4);               //Remove the .hcz extention
             outputTest[0] ='\0';
             strncpy(outputTest, inputPath, inputPathLength-4);
-            printf("\n\nTesting output string: %s\n\n", outputTest);*/
-            // String manipulation to figure out output filename here
-            outputName = (char*) malloc(sizeof(char)*(inputPathLength+5));
-            outputName[0] = '\0';
-            strcpy(outputName, inputPath);
-            strcat(outputName, ".txt");        //THIS NEEDS TO BE CHANGED BEFORE WE SUBMIT/////////////////////////////////////////////////////
 
             
             int outputDecomp = open(outputName, O_WRONLY | O_CREAT, 00600);         
