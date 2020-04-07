@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
 
     //each flag corresponds to 1 or 0. flagCheck will set the proper flags. If there is an error in the input, flagCheck will display error and exit()
     int bcdFlag = flagCheck(argc, argv);    
-    
+
     if(recursive == 0){
         DIR* testdir = opendir(argv[2]);
         if(testdir != NULL) {
