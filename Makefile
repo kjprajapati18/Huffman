@@ -22,11 +22,15 @@ inputHandler.o: inputHandler.c
 recurseTest: fileCompressor
 	./fileCompressor -R -b test2
 	./fileCompressor -R -c test2 HuffmanCodebook
+	mv test2/test4.txt test2/test4Old.txt
+	mv test2/test5.txt test2/test5Old.txt
+	mv test2/test10/test.txt test2/test10/testOld.txt
+	mv test2/test10/test2.txt test2/test10/test2Old.txt
 	./fileCompressor -R -d test2 HuffmanCodebook
-	diff test2/test4.txt test2/test4.txt.hcz.txt
-	diff test2/test5.txt test2/test5.txt.hcz.txt
-	diff test2/test10/test.txt test2/test10/test.txt.hcz.txt
-	diff test2/test10/test2.txt test2/test10/test2.txt.hcz.txt
+	diff test2/test4.txt test2/test4Old.txt
+	diff test2/test5.txt test2/test5Old.txt
+	diff test2/test10/test.txt test2/test10/testOld.txt
+	diff test2/test10/test2.txt test2/test10/test2Old.txt
 
 cleanText: fileCompressor
 	rm test2/test4.txt.hcz*
