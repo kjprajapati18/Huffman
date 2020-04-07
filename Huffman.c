@@ -155,9 +155,9 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
             *headAVL = codebookAvl(codeBook, rebuildHuffman);                       //Rebuild HuffmanTree using codebook
         
             // String manipulation to figure out output filename here
-            char *outputTest = (char*) malloc(inputPathLength - 4);               //Remove the .hcz extention
-            outputTest[0] ='\0';
-            strncpy(outputTest, inputPath, inputPathLength-4);
+            outputName = (char*) malloc(inputPathLength - 4);               //Remove the .hcz extention
+            outputName[0] ='\0';
+            strncpy(outputName, inputPath, inputPathLength-4);
 
             
             int outputDecomp = open(outputName, O_WRONLY | O_CREAT, 00600);         
