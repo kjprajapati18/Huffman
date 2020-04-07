@@ -139,7 +139,7 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
             inputCheck = buildHuffmanCodebook(input, headAVL, escapeChar);   //Will fill AVL tree and escapeChar based on input
             break;
         case _COMPRESS:
-            outputName = (char*) malloc(sizeof(char)*(inputPathLength+5+4));        //Adjust the name by appending .hcz
+            outputName = (char*) malloc(sizeof(char)*(inputPathLength+5));        //Adjust the name by appending .hcz
             outputName[0] = '\0';
             strcpy(outputName, inputPath);
             strcat(outputName, ".hcz");
@@ -155,9 +155,10 @@ int performOperation (int mode, Node** headAVL, int codeBook, char* inputPath, c
             *headAVL = codebookAvl(codeBook, rebuildHuffman);                       //Rebuild HuffmanTree using codebook
         
             // String manipulation to figure out output filename here
-            outputName = (char*) malloc(inputPathLength - 4);               //Remove the .hcz extention
+            outputName = (char*) malloc(inputPathLength +1);               //Remove the .hcz extention
             outputName[0] ='\0';
-            strncpy(outputName, inputPath, inputPathLength-4);
+            strcpy(outputName, inputPath);
+            outputName[inputPathLength-4] = '\0';
 
             
             int outputDecomp = open(outputName, O_WRONLY | O_CREAT, 00600);         
