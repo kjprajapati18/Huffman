@@ -22,7 +22,6 @@ int recursiveOperation(char* path, int codebook, Node** head, char** escapeChar,
     FINAL TO DO LIST
     - fix output name for decomp (uncomment it)
     - specify recusrions will recurse on huffmancodebook file in read me 
-    - if recursivve call but file instead of path, do command on file and then output normally with warning. specify this in read me
     - sift up (efficeincy)
     - If (*headAVL == NULL) codebookAVL(..) _>>>> In perform operation, that way we dont have to rebuild the AVL tree everytime
 
@@ -36,12 +35,20 @@ int main(int argc, char* argv[]){
     if(argc < 3) errorPrint("Fatal Error: Not enough arguments", 1);
 
     //each flag corresponds to 1 or 0. flagCheck will set the proper flags. If there is an error in the input, flagCheck will display error and exit()
-    int bcdFlag = flagCheck(argc, argv);
+    int bcdFlag = flagCheck(argc, argv);    
     
-    if(!recursive){
+    if(recursive == 0){
+        DIR* testdir = opendir(argv[2]);
+        if(testdir != NULL) {
+            closedir(testdir);
+            errorPrint("Fatal Error: Cannot operate on directory without recursive flag", 1);
+        }
         int test = open(argv[2], O_RDONLY);
-        if(test < 0) errorPrint("Fatal Error: Could not open file (does it exist?)", 1);
-        close(test);
+        if(test < 0) {
+            close(test);
+            errorPrint("Fatal Error: Could not open file (does it exist?)", 1);
+           
+        }
     }
 
     //

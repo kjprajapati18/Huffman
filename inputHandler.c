@@ -93,7 +93,7 @@ void printFiles(DIR* directory, char* basePath){
 //Prints an error message and exits the program
 void errorPrint(const char* message, int exitCode){
      printf("%s\n", message);
-    if(exitCode != 0) exit(exitCode);
+    if(exitCode !=0) exit(exitCode);
 }
 
 //Reads inputFd and either builds AVL tree in _BUILD mode or writes compressed file in _COMPRESS
