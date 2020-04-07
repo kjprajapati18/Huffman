@@ -1,0 +1,37 @@
+TestPlan: 
+==================================================================================================================================================================================================================================================================================================================================================================
+All of our tests involve this process: 
+
+We build a HuffmanCodebook using the build flag for a given set of inputs (either directories or files). 
+Then we compress the file(s) using that HuffmanCodebook and output .hcz files
+Then we decompress these .hcz files with the same codebook but we add a .txt at the end of the .hcz files (removed for final product, only for testing)
+We then diff the two files to see if our compression worked
+Each of the tests was also run through valgrind to check for memory leaks and to guarantee none existed
+
+
+Test1: Basic text file with words, spaces, and command codes
+    We tested this is as the primary function of the program: to compress individual files without losing any data. We made sure the output came in the same folder as the input and that there were no differences between what was decompressed and the original. We also examined the HuffmanCodebook for proper format and the correct escape character 
+    In addition, we printed out the Huffman tree upon completion and compared the built codebook with our own predictions for the tree and the tree that was built to guarantee correctness. 
+    We also checked file names to make sure compressions were .hcz and decompressions were only operating on .hcz files
+
+Test2: Directory with multiple files, and subdirectories
+    We tested this as a test of the recursion flag. We made sure all the outputs came into the same folder that they were supposed to be created in (not the given path but possibly the subdirectories in the path). We also tested all the resulting files to make sure the decompressed and original were the same. 
+
+Test3: Large files in a directory recursively
+    We tested this to make sure the program was not running inefficiently. We chose to run all the commands on files of greater than 3 MB and they all ran in adequate time (no step longer than a minute and a half for 10MB file). This was to test the efficiency of our code and guarantee that our data structures are doing as intended.
+
+Test4: empty file
+    We tested this to make sure the program did not crash on empty files and instead outputted a proper warning to the user. It then compresses the empty file to nothing and decompresses it back to nothing. The codebook is just an escape character.
+
+Test5: empty directory 
+    We tested this to make sure the program did not crash on seeing directories with no files and instead outputted a warning to the user. It then does not output, compress or decompress anything since there is no file to open. 
+
+Test 6: Single token file
+    WE tested this to make sure the Huffman tree was not crashing when faced with only one token to compress. It successfully builds the tree and does not offer a warning to the user as it is working as intended
+
+Test 7: Error Checks
+    We tested numerous wrong flag, file and directory inputs into the function to make sure it did not run on fatal errors. These include (but are not limited to): forgetting a flag, using a wrong flag, inputting a directory path without a recursive flag, putting a file path with a recursive flag, and putting non-openable files and directories
+
+Test 8: Correct codebook
+    We tested using codebooks that were missing tokens when compressing to make sure the program recognized that the tokens were not in the codebook and will fatal error on compress and decompress rather than outputing unfinished compressions or decompressions
+
